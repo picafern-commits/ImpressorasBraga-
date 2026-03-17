@@ -20,6 +20,7 @@ button{
   margin:5px;
   border-radius:10px;
   border:none;
+  cursor:pointer;
 }
 
 .cards{
@@ -33,8 +34,4 @@ button{
   color:white;
   padding:20px;
   border-radius:15px;
-}
-
-#listaStock .card{
-  margin:10px;
 }
