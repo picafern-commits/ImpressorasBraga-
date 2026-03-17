@@ -10,6 +10,9 @@
 <!-- SCANNER -->
 <script src="https://unpkg.com/html5-qrcode"></script>
 
+<!-- EXCEL -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
 </head>
 <body>
 
@@ -20,9 +23,8 @@ Toner Manager
 
 <div class="container">
 
-<!-- PAGINA 1 -->
+<!-- REGISTO -->
 <div id="registo" class="card">
-
 <h3>Registo Toners</h3>
 
 <select id="equipamento">
@@ -56,22 +58,22 @@ Toner Manager
 </select>
 
 <button onclick="registarToner()">Disponível</button>
-
 <button onclick="abrirScanner()">📷 Scanner</button>
-<div id="reader"></div>
 
+<div id="reader"></div>
 </div>
 
-<!-- PAGINA 2 -->
+<!-- STOCK -->
 <div id="stock" class="card" style="display:none;">
 <h3>Stock Toners</h3>
 
+<button onclick="exportarStock()">📥 Exportar Excel</button>
 <input type="text" id="pesquisa" placeholder="Pesquisar..." oninput="filtrarStock()">
 
 <div id="listaStock"></div>
 </div>
 
-<!-- PAGINA 3 -->
+<!-- MANUTENÇÃO -->
 <div id="manutencao" class="card" style="display:none;">
 <h3>Manutenção Impressoras</h3>
 
@@ -102,12 +104,13 @@ Toner Manager
 <input type="date" id="dataM">
 
 <button onclick="guardarManutencao()">Guardar</button>
-
 </div>
 
-<!-- PAGINA 4 -->
+<!-- HISTÓRICO -->
 <div id="historico" class="card" style="display:none;">
 <h3>Histórico Manutenções</h3>
+
+<button onclick="exportarManutencoes()">📥 Exportar Excel</button>
 
 <table border="1" width="100%">
 <thead>
@@ -134,7 +137,7 @@ Toner Manager
 <a onclick="mudarPagina('historico')">Histórico</a>
 </div>
 
-<script src="script.js"></script>
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
