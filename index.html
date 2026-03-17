@@ -6,7 +6,6 @@
 
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
-
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 </head>
@@ -18,7 +17,6 @@
   <h2>Login</h2>
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
-
   <button onclick="loginUser()">Entrar</button>
   <button onclick="registarUser()">Criar Conta</button>
 </div>
@@ -42,32 +40,44 @@
   <div class="cards">
     <div class="card"><h3 id="totalStock">0</h3><p>Toners</p></div>
     <div class="card"><h3 id="totalMan">0</h3><p>Manutenções</p></div>
-    <div class="card"><h3 id="pretos">0</h3><p>Pretos</p></div>
   </div>
 </div>
 
 <!-- REGISTO -->
 <div id="registo" style="display:none">
-  <select id="equipamento">
-    <option>P3155DN</option>
-    <option>TASKalfa_255ci</option>
-    <option>PA5500x</option>
-  </select>
 
-  <select id="localizacao">
-    <option>Ilha 1</option>
-    <option>Ilha 2</option>
-    <option>Ilha 3</option>
-  </select>
+<select id="equipamento">
+  <option>P3155DN</option>
+  <option>TASKalfa_255ci</option>
+  <option>PA5500x</option>
+</select>
 
-  <select id="cor">
-    <option>Preto</option>
-    <option>Amarelo</option>
-    <option>Azul</option>
-    <option>Vermelho</option>
-  </select>
+<select id="localizacao">
+  <option>Ilha 1 - R4B2229805</option>
+  <option>Ilha 2 - WD44336210</option>
+  <option>Ilha 3 - R4B1395508</option>
+  <option>Ilha 4 - R4B1293179</option>
+  <option>Ilha 5 - R4B1293180</option>
+  <option>Balcão 1 - R4B1293183</option>
+  <option>Balcão 2 - R4B1293184</option>
+  <option>Dep.Logistica - R4B2230012</option>
+  <option>Grandes.Encomendas - R4B1293173</option>
+  <option>Devoluções - R4B1395261</option>
+  <option>Escritório - RVP0ZZ03770</option>
+  <option>Ilha1-VRL - R4B1293169</option>
+  <option>Ilha2-VRL - R4B1293174</option>
+  <option>Ilha3-VRL - RVP0Z03715</option>
+</select>
 
-  <button onclick="registarToner()">Disponível</button>
+<select id="cor">
+  <option>Preto</option>
+  <option>Amarelo</option>
+  <option>Azul</option>
+  <option>Vermelho</option>
+</select>
+
+<button onclick="registarToner()">Disponível</button>
+
 </div>
 
 <!-- STOCK -->
@@ -79,11 +89,39 @@
 
 <!-- MANUTENÇÃO -->
 <div id="manutencao" style="display:none">
-  <input id="equipamentoM" placeholder="Equipamento">
-  <input id="localizacaoM" placeholder="Local">
-  <input id="descricaoM" placeholder="Descrição">
-  <input id="dataM" type="date">
-  <button onclick="guardarManutencao()">Guardar</button>
+
+<select id="equipamentoM">
+  <option>P3155DN</option>
+  <option>TASKalfa_255ci</option>
+  <option>PA5500x</option>
+</select>
+
+<select id="localizacaoM">
+  <option>Ilha 1 - R4B2229805</option>
+  <option>Ilha 2 - WD44336210</option>
+  <option>Ilha 3 - R4B1395508</option>
+  <option>Ilha 4 - R4B1293179</option>
+  <option>Ilha 5 - R4B1293180</option>
+  <option>Balcão 1 - R4B1293183</option>
+  <option>Balcão 2 - R4B1293184</option>
+  <option>Dep.Logistica - R4B2230012</option>
+  <option>Grandes.Encomendas - R4B1293173</option>
+  <option>Devoluções - R4B1395261</option>
+  <option>Escritório - RVP0ZZ03770</option>
+  <option>Ilha1-VRL - R4B1293169</option>
+  <option>Ilha2-VRL - R4B1293174</option>
+  <option>Ilha3-VRL - RVP0Z03715</option>
+</select>
+
+<input id="descricaoM" placeholder="Descrição da manutenção">
+
+<label>
+  <input type="checkbox" id="feitoM">
+  Manutenção concluída
+</label>
+
+<button onclick="guardarManutencao()">Guardar</button>
+
 </div>
 
 <!-- HISTÓRICO -->
