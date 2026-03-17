@@ -57,11 +57,13 @@ button{
 
 .bottom-nav{
   position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
+  bottom:20px;   /* 👈 sobe o menu */
+  left:10px;
+  right:10px;
   display:flex;
   justify-content:space-around;
   background:var(--card);
   padding:10px;
+  border-radius:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
 }
