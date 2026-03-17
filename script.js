@@ -1,204 +1,89 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, limit, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
+// 🔥 FIREBASE (COLOCA OS TEUS DADOS)
 const firebaseConfig = {
   apiKey: "AIzaSyCSgw4rhBLW5mq4QClulubf6e0hf5lDJbo",
   authDomain: "toner-manager-756c4.firebaseapp.com",
   projectId: "toner-manager-756c4",
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
-const auth = getAuth(firebaseApp);
-
-// LOGIN
-window.registarUser = async ()=>{
-  await createUserWithEmailAndPassword(auth,
-    document.getElementById("email").value,
-    document.getElementById("password").value
-  );
-};
-
-window.loginUser = async ()=>{
-  await signInWithEmailAndPassword(auth,
-    document.getElementById("email").value,
-    document.getElementById("password").value
-  );
-};
-
-// AUTH
-onAuthStateChanged(auth, user=>{
-  if(user){
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("appUI").style.display="block";
-
-    mostrarStock();
-    mostrarHistorico();
-    atualizarDashboard();
-  }
-});
-
-// DARK
-window.toggleDark = ()=>{
-  document.body.classList.toggle("dark");
-};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 // NAV
-window.mudarPagina = (p)=>{
-  ["dashboard","registo","stock","manutencao","historico"].forEach(x=>{
-    document.getElementById(x).style.display="none";
-  });
-  document.getElementById(p).style.display="block";
-};
+function mudarPagina(p){
+document.querySelectorAll(".card").forEach(el=>el.style.display="none");
+document.getElementById(p).style.display="block";
+}
+
+// GERAR ID
+async function gerarID(){
+let snap = await db.collection("toners").get();
+return "TN" + String(snap.size+1).padStart(3,"0");
+}
 
 // REGISTO TONER
-window.registarToner = async ()=>{
-  await addDoc(collection(db,"stock"),{
-    equipamento: document.getElementById("equipamento").value,
-    localizacao: document.getElementById("localizacao").value,
-    cor: document.getElementById("cor").value
-  });
+async function registar(){
+let eq = equipamento.value;
+let loc = localizacao.value;
+let cor = document.getElementById("cor").value;
 
-  mostrarStock();
-  atualizarDashboard();
-};
+let id = await gerarID();
+
+await db.collection("toners").add({id,eq,loc,cor});
+
+alert("✅ Toner registado!");
+carregarStock();
+}
 
 // STOCK
-async function mostrarStock(){
-  const lista = document.getElementById("listaStock");
-  lista.innerHTML="";
+function carregarStock(){
+let lista = document.getElementById("listaStock");
 
-  const snap = await getDocs(collection(db,"stock"));
-
-  snap.forEach(d=>{
-    let t = d.data();
-
-    lista.innerHTML+=`
-      <div class="card">
-        ${t.equipamento}<br>
-        ${t.cor}<br>
-        ${t.localizacao}
-        <button onclick="remover('${d.id}')">X</button>
-      </div>
-    `;
-  });
+db.collection("toners").get().then(snap=>{
+lista.innerHTML="";
+snap.forEach(doc=>{
+let d = doc.data();
+lista.innerHTML += `<div>${d.id} - ${d.eq} - ${d.cor} - ${d.loc}</div>`;
+});
+});
 }
-
-// REMOVER
-window.remover = async (id)=>{
-  await deleteDoc(doc(db,"stock",id));
-  mostrarStock();
-  atualizarDashboard();
-};
+carregarStock();
 
 // PESQUISA
-window.filtrarStock = ()=>{
-  let f = document.getElementById("pesquisa").value.toLowerCase();
-  let items = document.getElementById("listaStock").children;
-
-  Array.from(items).forEach(el=>{
-    el.style.display = el.innerText.toLowerCase().includes(f) ? "block":"none";
-  });
-};
-
-// GUARDAR MANUTENÇÃO
-window.guardarManutencao = async ()=>{
-
-  const descricao = document.getElementById("descricaoM").value;
-
-  if(!descricao){
-    alert("Escreve a descrição!");
-    return;
-  }
-
-  await addDoc(collection(db,"manutencoes"),{
-    equipamento: document.getElementById("equipamentoM").value,
-    localizacao: document.getElementById("localizacaoM").value,
-    descricao,
-    concluido:false,
-    data:null
-  });
-
-  mostrarHistorico();
-  atualizarDashboard();
-};
-
-// HISTÓRICO COM CHECKBOX
-async function mostrarHistorico(){
-  const tabela = document.getElementById("tabelaManutencao");
-  tabela.innerHTML="";
-
-  const snap = await getDocs(collection(db,"manutencoes"));
-
-  snap.forEach(d=>{
-    let m = d.data();
-
-    tabela.innerHTML+=`
-      <tr style="background:${m.concluido ? '#22c55e20' : '#ef444420'}">
-        <td>${m.equipamento}</td>
-        <td>${m.localizacao}</td>
-        <td>${m.descricao}</td>
-        <td>${m.data || "-"}</td>
-        <td>
-          <input type="checkbox"
-            ${m.concluido ? "checked":""}
-            onchange="concluirManutencao('${d.id}', this.checked)">
-        </td>
-      </tr>
-    `;
-  });
+function filtrar(){
+let f = document.getElementById("pesquisa").value.toLowerCase();
+Array.from(listaStock.children).forEach(el=>{
+el.style.display = el.innerText.toLowerCase().includes(f) ? "block" : "none";
+});
 }
 
-// CONCLUIR MANUTENÇÃO
-window.concluirManutencao = async (id, estado)=>{
+// MANUTENÇÃO
+function guardarManutencao(){
+let eq = equipamentoM.value;
+let loc = localizacaoM.value;
+let desc = descricao.value;
+let data = document.getElementById("data").value;
 
-  let data = estado ? new Date().toISOString().split("T")[0] : null;
+db.collection("manutencao").add({eq,loc,desc,data});
 
-  await updateDoc(doc(db,"manutencoes",id),{
-    concluido: estado,
-    data
-  });
-
-  mostrarHistorico();
-  atualizarDashboard();
-};
-
-// DASHBOARD
-async function atualizarDashboard(){
-  const s = await getDocs(collection(db,"stock"));
-  const m = await getDocs(collection(db,"manutencoes"));
-
-  document.getElementById("totalStock").innerText = s.size;
-  document.getElementById("totalMan").innerText = m.size;
-
-  let pendentes = 0;
-  m.forEach(d=>{
-    if(!d.data().concluido) pendentes++;
-  });
-
-  document.getElementById("pendentes").innerText = pendentes;
+alert("✅ Guardado!");
+carregarHistorico();
 }
 
-// EXPORT
-window.exportarStock = async ()=>{
-  const snap = await getDocs(collection(db,"stock"));
-  let dados = [];
-  snap.forEach(d=>dados.push(d.data()));
+// HISTÓRICO
+function carregarHistorico(){
+let t = document.getElementById("tabela");
 
-  let ws = XLSX.utils.json_to_sheet(dados);
-  let wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Stock");
-  XLSX.writeFile(wb, "stock.xlsx");
-};
+db.collection("manutencao").get().then(snap=>{
+t.innerHTML="";
+snap.forEach(doc=>{
+let d = doc.data();
+t.innerHTML += `<tr><td>${d.eq}</td><td>${d.loc}</td><td>${d.desc}</td><td>${d.data}</td></tr>`;
+});
+});
+}
+carregarHistorico();
 
-window.exportarManutencoes = async ()=>{
-  const snap = await getDocs(collection(db,"manutencoes"));
-  let dados = [];
-  snap.forEach(d=>dados.push(d.data()));
-
-  let ws = XLSX.utils.json_to_sheet(dados);
-  let wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Manutencoes");
-  XLSX.writeFile(wb, "manutencoes.xlsx");
-};
+// SCANNER
+function abrirScanner(){
+alert("Scanner pronto 📷 (ativa depois se quiseres)");
+}
