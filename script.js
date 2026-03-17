@@ -1,144 +1,119 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 🔥 FIREBASE CONFIG (já está OK)
 const firebaseConfig = {
-  apiKey: "AIzaSyCSgw4rhBLW5mq4QClulubf6e0hf5lDJbo",
+  apiKey: "AIzaSy...",
   authDomain: "toner-manager-756c4.firebaseapp.com",
   projectId: "toner-manager-756c4",
-  storageBucket: "toner-manager-756c4.firebasestorage.app",
-  messagingSenderId: "1004492465437",
-  appId: "1:1004492465437:web:6a745933c51fc17b04adf4"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🌙 DARK MODE
-function toggleDark(){
+// DARK MODE
+window.toggleDark = () => {
   document.body.classList.toggle("dark");
-  localStorage.setItem("modo", document.body.classList.contains("dark")?"dark":"light");
-}
-window.toggleDark = toggleDark;
-
-// 🚀 INICIO
-window.onload = () => {
-  if(localStorage.getItem("modo")==="dark"){
-    document.body.classList.add("dark");
-  }
-  mostrarStock();
-  mostrarHistorico();
 };
 
-// 📱 PAGINAS
-function mudarPagina(p){
+// PAGINAS
+window.mudarPagina = (p) => {
   ["registo","stock","manutencao","historico"].forEach(x=>{
     document.getElementById(x).style.display="none";
   });
   document.getElementById(p).style.display="block";
-}
-window.mudarPagina = mudarPagina;
+};
 
-// ✅ REGISTAR TONER
-async function registarToner(){
+// ID PROFISSIONAL
+async function gerarID(){
+  const q = query(collection(db,"stock"), orderBy("id","desc"), limit(1));
+  const snap = await getDocs(q);
 
-  let eq = document.getElementById("equipamento").value;
-  let loc = document.getElementById("localizacao").value;
-  let corValue = document.getElementById("cor").value;
-
-  let id = "TN" + Date.now();
-
-  try{
-    await addDoc(collection(db, "stock"), {
-      id: id,
-      equipamento: eq,
-      localizacao: loc,
-      cor: corValue
-    });
-
-    alert("✅ Guardado com sucesso!");
-    mostrarStock();
-
-  } catch(e){
-    console.error("ERRO FIREBASE:", e);
-    alert("❌ Erro ao guardar!");
+  let n = 1;
+  if(!snap.empty){
+    let ultimo = snap.docs[0].data().id;
+    n = parseInt(ultimo.replace("TN","")) + 1;
   }
+
+  return "TN" + String(n).padStart(3,"0");
 }
-window.registarToner = registarToner;
 
-// 📦 STOCK
+// REGISTAR
+window.registarToner = async () => {
+
+  let id = await gerarID();
+
+  await addDoc(collection(db,"stock"),{
+    id,
+    equipamento: equipamento.value,
+    localizacao: localizacao.value,
+    cor: cor.value
+  });
+
+  alert("Guardado: "+id);
+  mostrarStock();
+};
+
+// STOCK
 async function mostrarStock(){
-  let lista = document.getElementById("listaStock");
-  lista.innerHTML="";
+  listaStock.innerHTML="";
 
-  const querySnapshot = await getDocs(collection(db, "stock"));
+  const snap = await getDocs(collection(db,"stock"));
 
-  querySnapshot.forEach((docSnap)=>{
-    let t = docSnap.data();
+  snap.forEach(d=>{
+    let t = d.data();
 
-    lista.innerHTML+=`
+    listaStock.innerHTML+=`
       <div class="card">
         <b>${t.id}</b><br>
         ${t.equipamento}<br>
         ${t.cor}<br>
-        ${t.localizacao}<br><br>
-
-        <button onclick="removerToner('${docSnap.id}')" style="background:red;">
-          Remover
-        </button>
+        ${t.localizacao}<br>
+        <button onclick="remover('${d.id}')">Remover</button>
       </div>
     `;
   });
+
+  if(snap.size <= 3){
+    alert("⚠️ Stock baixo!");
+  }
 }
 
-// 🗑 REMOVER
-async function removerToner(id){
-  await deleteDoc(doc(db, "stock", id));
+window.remover = async (id)=>{
+  await deleteDoc(doc(db,"stock",id));
   mostrarStock();
-}
-window.removerToner = removerToner;
+};
 
-// 🔍 PESQUISA
-function filtrarStock(){
-  let filtro = document.getElementById("pesquisa").value.toLowerCase();
-  let items = document.getElementById("listaStock").children;
-
-  Array.from(items).forEach(el=>{
-    el.style.display = el.innerText.toLowerCase().includes(filtro) ? "block":"none";
+// PESQUISA
+window.filtrarStock = ()=>{
+  let f = pesquisa.value.toLowerCase();
+  Array.from(listaStock.children).forEach(el=>{
+    el.style.display = el.innerText.toLowerCase().includes(f)?"block":"none";
   });
-}
-window.filtrarStock = filtrarStock;
+};
 
-// 🔧 MANUTENÇÃO
-async function guardarManutencao(){
-  let eq = document.getElementById("equipamentoM").value;
-  let loc = document.getElementById("localizacaoM").value;
-  let desc = document.getElementById("descricaoM").value;
-  let data = document.getElementById("dataM").value;
-
-  await addDoc(collection(db, "manutencoes"), {
-    equipamento:eq,
-    localizacao:loc,
-    descricao:desc,
-    data
+// MANUTENÇÃO
+window.guardarManutencao = async ()=>{
+  await addDoc(collection(db,"manutencoes"),{
+    equipamento: equipamentoM.value,
+    localizacao: localizacaoM.value,
+    descricao: descricaoM.value,
+    data: dataM.value
   });
 
-  alert("✅ Manutenção registada!");
+  alert("Guardado!");
   mostrarHistorico();
-}
-window.guardarManutencao = guardarManutencao;
+};
 
-// 📜 HISTÓRICO
+// HISTÓRICO
 async function mostrarHistorico(){
-  let tabela = document.getElementById("tabelaManutencao");
-  tabela.innerHTML="";
+  tabelaManutencao.innerHTML="";
 
-  const querySnapshot = await getDocs(collection(db, "manutencoes"));
+  const snap = await getDocs(collection(db,"manutencoes"));
 
-  querySnapshot.forEach(docSnap=>{
-    let m = docSnap.data();
+  snap.forEach(d=>{
+    let m = d.data();
 
-    tabela.innerHTML+=`
+    tabelaManutencao.innerHTML+=`
       <tr>
         <td>${m.equipamento}</td>
         <td>${m.localizacao}</td>
@@ -149,84 +124,55 @@ async function mostrarHistorico(){
   });
 }
 
-// 📥 EXPORTAR STOCK
-async function exportarStock(){
-  const querySnapshot = await getDocs(collection(db, "stock"));
-  let dados = [];
+// EXPORTAR
+window.exportarStock = async ()=>{
+  const snap = await getDocs(collection(db,"stock"));
+  let dados=[];
 
-  querySnapshot.forEach(docSnap=>{
-    let t = docSnap.data();
+  snap.forEach(d=>dados.push(d.data()));
 
-    dados.push({
-      ID: t.id,
-      Equipamento: t.equipamento,
-      Cor: t.cor,
-      Localizacao: t.localizacao
-    });
-  });
+  let ws = XLSX.utils.json_to_sheet(dados);
+  let wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Stock");
 
-  const ws = XLSX.utils.json_to_sheet(dados);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Stock");
+  XLSX.writeFile(wb,"stock.xlsx");
+};
 
-  XLSX.writeFile(wb, "Stock_Toners.xlsx");
-}
-window.exportarStock = exportarStock;
+window.exportarManutencoes = async ()=>{
+  const snap = await getDocs(collection(db,"manutencoes"));
+  let dados=[];
 
-// 📥 EXPORTAR MANUTENÇÕES
-async function exportarManutencoes(){
-  const querySnapshot = await getDocs(collection(db, "manutencoes"));
-  let dados = [];
+  snap.forEach(d=>dados.push(d.data()));
 
-  querySnapshot.forEach(docSnap=>{
-    let m = docSnap.data();
+  let ws = XLSX.utils.json_to_sheet(dados);
+  let wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Manutencoes");
 
-    dados.push({
-      Equipamento: m.equipamento,
-      Localizacao: m.localizacao,
-      Descricao: m.descricao,
-      Data: m.data
-    });
-  });
+  XLSX.writeFile(wb,"manutencoes.xlsx");
+};
 
-  const ws = XLSX.utils.json_to_sheet(dados);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Manutencoes");
+// SCANNER
+let scanner;
+window.abrirScanner = ()=>{
+  scanner = new Html5Qrcode("reader");
 
-  XLSX.writeFile(wb, "Historico_Manutencoes.xlsx");
-}
-window.exportarManutencoes = exportarManutencoes;
+  scanner.start({facingMode:"environment"}, {fps:10},
+    txt=>{
+      let d = txt.split("|");
 
-// 📷 SCANNER
-let scannerAtivo=false;
-let html5QrCode;
+      equipamento.value = d[0] || "";
+      localizacao.value = d[1] || "";
+      cor.value = d[2] || "";
 
-function abrirScanner(){
-  let reader=document.getElementById("reader");
+      alert("QR carregado!");
 
-  if(!scannerAtivo){
-    html5QrCode=new Html5Qrcode("reader");
+      scanner.stop();
+    }
+  );
+};
 
-    html5QrCode.start(
-      { facingMode:"environment" },
-      { fps:10, qrbox:250 },
-
-      txt=>{
-        document.getElementById("localizacao").value = txt;
-        alert("Código: "+txt);
-
-        html5QrCode.stop();
-        scannerAtivo=false;
-        reader.innerHTML="";
-      }
-    );
-
-    scannerAtivo=true;
-
-  } else {
-    html5QrCode.stop();
-    scannerAtivo=false;
-    reader.innerHTML="";
-  }
-}
-window.abrirScanner = abrirScanner;
+// INIT
+window.onload = ()=>{
+  mostrarStock();
+  mostrarHistorico();
+};
