@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-<!-- FIREBASE (OBRIGATÓRIO) -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
@@ -27,6 +27,7 @@ h2{
   font-size:24px;
 }
 
+/* INPUTS */
 select{
   width:100%;
   padding:14px;
@@ -36,6 +37,7 @@ select{
   font-size:16px;
 }
 
+/* BOTÃO */
 button{
   width:100%;
   padding:16px;
@@ -46,6 +48,7 @@ button{
   font-size:16px;
 }
 
+/* CARDS */
 .card{
   background:white;
   padding:16px;
@@ -56,26 +59,37 @@ button{
   align-items:center;
 }
 
+/* CHECKBOX */
 .card input{
   width:24px;
   height:24px;
 }
 
+/* NAVBAR */
 nav{
   position:fixed;
   bottom:0;
   width:100%;
-  background:white;
+  background:rgba(255,255,255,0.9);
+  backdrop-filter: blur(12px);
   display:flex;
   justify-content:space-around;
-  padding:15px 0;
+  padding:14px 0;
   border-top:1px solid #ddd;
 }
 
 nav button{
   background:none;
+  border:none;
+  font-size:24px;
+  color:#999;
+  transition:0.2s;
+}
+
+/* BOTÃO ATIVO */
+nav button.active{
   color:#007AFF;
-  font-size:22px;
+  transform:scale(1.2);
 }
 
 </style>
@@ -139,10 +153,13 @@ nav button{
 
 </div>
 
+<!-- NAV -->
 <nav>
-<button onclick="mudarPagina('registo')">➕</button>
-<button onclick="mudarPagina('stock')">📦</button>
-<button onclick="mudarPagina('historico')">📜</button>
+
+<button id="btnRegisto" onclick="mudarPagina('registo', this)">➕</button>
+<button id="btnStock" onclick="mudarPagina('stock', this)">📦</button>
+<button id="btnHistorico" onclick="mudarPagina('historico', this)">📜</button>
+
 </nav>
 
 <script src="app.js"></script>
