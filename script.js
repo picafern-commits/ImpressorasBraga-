@@ -1,9 +1,4 @@
-// 🔥 TORNAR TUDO GLOBAL
-window.mudarPagina = mudarPagina;
-window.disponivel = disponivel;
-window.usar = usar;
-
-// FIREBASE
+// 🔥 FIREBASE CONFIG
 const firebaseConfig = {
  apiKey: "AIzaSyCSgw4rhBLW5mq4QClulubf6e0hf5lDJbo",
  authDomain: "toner-manager-756c4.firebaseapp.com",
@@ -13,7 +8,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// NAV
+// ---------------- NAV ----------------
 function mudarPagina(p, btn){
 
   document.getElementById("registo").style.display="none";
@@ -32,12 +27,16 @@ function mudarPagina(p, btn){
   if(p==="historico") mostrarHistorico();
 }
 
-// REGISTO
+// 🔥 MUITO IMPORTANTE (resolve o teu problema)
+window.mudarPagina = mudarPagina;
+
+
+// ---------------- REGISTO ----------------
 async function disponivel(){
 
-  let eq = equipamento.value;
-  let loc = localizacao.value;
-  let c = cor.value;
+  let eq = document.getElementById("equipamento").value;
+  let loc = document.getElementById("localizacao").value;
+  let c = document.getElementById("cor").value;
 
   if(!eq || !loc || !c){
     alert("Preenche tudo!");
@@ -53,7 +52,10 @@ async function disponivel(){
   alert("Guardado!");
 }
 
-// STOCK
+window.disponivel = disponivel;
+
+
+// ---------------- STOCK ----------------
 async function mostrarStock(){
 
   let lista = document.getElementById("listaStock");
@@ -73,7 +75,8 @@ async function mostrarStock(){
   });
 }
 
-// USAR
+
+// ---------------- USAR ----------------
 async function usar(id){
 
   let ref = db.collection("stock").doc(id);
@@ -88,7 +91,10 @@ async function usar(id){
   mostrarStock();
 }
 
-// HISTORICO
+window.usar = usar;
+
+
+// ---------------- HISTÓRICO ----------------
 async function mostrarHistorico(){
 
   let lista = document.getElementById("listaHistorico");
@@ -107,7 +113,8 @@ async function mostrarHistorico(){
   });
 }
 
-// START
+
+// ---------------- START ----------------
 window.onload = ()=>{
   document.querySelector("nav button").classList.add("active");
 };
