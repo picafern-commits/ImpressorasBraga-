@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ⚠️ METE OS TEUS DADOS REAIS
 const firebaseConfig = {
  apiKey: "AIzaSyCSgw4rhBLW5mq4QClulubf6e0hf5lDJbo",
  authDomain: "toner-manager-756c4.firebaseapp.com",
@@ -11,53 +10,55 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ---------------- NAV ----------------
-window.mudarPagina = (p)=>{
-  ["registo","stock","historico"].forEach(x=>{
-    document.getElementById(x).style.display="none";
-  });
+// 🔥 GARANTE BOTÕES A FUNCIONAR
+window.onload = () => {
 
-  document.getElementById(p).style.display="block";
+  window.mudarPagina = (p)=>{
+    ["registo","stock","historico"].forEach(x=>{
+      document.getElementById(x).style.display="none";
+    });
 
-  if(p==="stock") mostrarStock();
-  if(p==="historico") mostrarHistorico();
+    document.getElementById(p).style.display="block";
+
+    if(p==="stock") mostrarStock();
+    if(p==="historico") mostrarHistorico();
+  };
+
+  window.toggleDark = ()=>{
+    document.body.classList.toggle("dark");
+  };
+
+  window.disponivel = async ()=>{
+    const eq = document.getElementById("equipamento").value;
+    const loc = document.getElementById("localizacao").value;
+    const cor = document.getElementById("cor").value;
+
+    if(!eq || !loc || !cor){
+      alert("Preenche todos os campos!");
+      return;
+    }
+
+    await addDoc(collection(db,"stock"),{
+      equipamento:eq,
+      localizacao:loc,
+      cor:cor,
+      data:new Date().toISOString()
+    });
+
+    alert("Adicionado ao stock!");
+
+    equipamento.value="";
+    localizacao.value="";
+    cor.value="";
+  };
+
 };
 
-// ---------------- DARK MODE ----------------
-window.toggleDark = ()=>{
-  document.body.classList.toggle("dark");
-};
-
-// ---------------- REGISTO ----------------
-window.disponivel = async ()=>{
-
-  const eq = document.getElementById("equipamento").value;
-  const loc = document.getElementById("localizacao").value;
-  const cor = document.getElementById("cor").value;
-
-  if(!eq || !loc || !cor){
-    alert("Preenche todos os campos!");
-    return;
-  }
-
-  await addDoc(collection(db,"stock"),{
-    equipamento:eq,
-    localizacao:loc,
-    cor:cor,
-    data:new Date().toISOString()
-  });
-
-  alert("Adicionado ao stock!");
-
-  document.getElementById("equipamento").value="";
-  document.getElementById("localizacao").value="";
-  document.getElementById("cor").value="";
-};
-
-// ---------------- STOCK ----------------
+// STOCK
 async function mostrarStock(){
-
   const lista = document.getElementById("listaStock");
+  if(!lista) return;
+
   lista.innerHTML="";
 
   const snap = await getDocs(collection(db,"stock"));
@@ -79,9 +80,8 @@ async function mostrarStock(){
   });
 }
 
-// ---------------- USAR TONER ----------------
+// USAR TONER
 window.usar = async (id)=>{
-
   const ref = doc(db,"stock",id);
   const snap = await getDoc(ref);
 
@@ -99,10 +99,11 @@ window.usar = async (id)=>{
   mostrarStock();
 };
 
-// ---------------- HISTÓRICO ----------------
+// HISTÓRICO
 async function mostrarHistorico(){
-
   const lista = document.getElementById("listaHistorico");
+  if(!lista) return;
+
   lista.innerHTML="";
 
   const snap = await getDocs(collection(db,"historico"));
@@ -122,8 +123,3 @@ async function mostrarHistorico(){
     `;
   });
 }
-
-// INIT
-window.onload = ()=>{
-  mostrarStock();
-};
