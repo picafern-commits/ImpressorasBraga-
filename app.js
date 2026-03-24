@@ -9,15 +9,20 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 
-// -------- NAV --------
-function mudarPagina(p){
+// NAV
+function mudarPagina(p, btn){
 
-  document.getElementById("registo").style.display="none";
-  document.getElementById("stock").style.display="none";
-  document.getElementById("historico").style.display="none";
-  document.getElementById("settings").style.display="none";
+  ["registo","stock","historico","settings"].forEach(x=>{
+    document.getElementById(x).style.display="none";
+  });
 
   document.getElementById(p).style.display="block";
+
+  document.querySelectorAll("nav button").forEach(b=>{
+    b.classList.remove("active");
+  });
+
+  if(btn) btn.classList.add("active");
 
   if(p==="stock") mostrarStock();
   if(p==="historico") mostrarHistorico();
@@ -25,24 +30,21 @@ function mudarPagina(p){
 window.mudarPagina = mudarPagina;
 
 
-// -------- DARK MODE --------
+// DARK MODE
 function toggleDark(){
 
   document.body.classList.toggle("dark");
 
-  if(document.body.classList.contains("dark")){
-    localStorage.setItem("modo","dark");
-  } else {
-    localStorage.setItem("modo","light");
-  }
+  localStorage.setItem("modo",
+    document.body.classList.contains("dark") ? "dark":"light"
+  );
 }
 window.toggleDark = toggleDark;
 
 
-// -------- START --------
+// START
 window.onload = ()=>{
 
-  // aplicar modo guardado
   if(localStorage.getItem("modo")==="dark"){
     document.body.classList.add("dark");
   }
@@ -51,11 +53,11 @@ window.onload = ()=>{
 };
 
 
-// -------- REGISTO --------
+// REGISTO
 async function disponivel(){
 
-  let eq = document.getElementById("equipamento").value;
-  let loc = document.getElementById("localizacao").value;
+  let eq = equipamento.value;
+  let loc = localizacao.value;
   let cor = document.getElementById("cor").value;
   let data = document.getElementById("data").value;
 
@@ -72,17 +74,11 @@ async function disponivel(){
   });
 
   alert("Guardado!");
-
-  // limpar campos
-  document.getElementById("equipamento").value="";
-  document.getElementById("localizacao").value="";
-  document.getElementById("cor").value="";
-  document.getElementById("data").value="";
 }
 window.disponivel = disponivel;
 
 
-// -------- STOCK --------
+// STOCK
 async function mostrarStock(){
 
   let lista = document.getElementById("listaStock");
@@ -96,8 +92,8 @@ async function mostrarStock(){
     lista.innerHTML+=`
       <div class="card">
         ${t.equipamento} - ${t.cor}<br>
-        📍 ${t.localizacao}<br>
-        📅 ${t.data}
+        <small>📍 ${t.localizacao}</small>
+        <small>📅 ${t.data}</small>
         <input type="checkbox" onchange="usar('${doc.id}')">
       </div>
     `;
@@ -105,7 +101,7 @@ async function mostrarStock(){
 }
 
 
-// -------- USAR --------
+// USAR
 async function usar(id){
 
   let ref = db.collection("stock").doc(id);
@@ -113,7 +109,7 @@ async function usar(id){
 
   await db.collection("historico").add({
     ...snap.data(),
-    usadoEm: new Date().toISOString()
+    usadoEm:new Date().toISOString()
   });
 
   await ref.delete();
@@ -123,7 +119,7 @@ async function usar(id){
 window.usar = usar;
 
 
-// -------- HISTÓRICO --------
+// HISTÓRICO
 async function mostrarHistorico(){
 
   let lista = document.getElementById("listaHistorico");
@@ -136,10 +132,9 @@ async function mostrarHistorico(){
 
     lista.innerHTML+=`
       <div class="card">
-        ${t.equipamento} - ${t.cor}<br>
-        📍 ${t.localizacao}<br>
-        📅 ${t.data}<br>
-        ✔ Usado: ${t.usadoEm ? new Date(t.usadoEm).toLocaleDateString() : ""}
+        ${t.equipamento} - ${t.cor}
+        <small>📍 ${t.localizacao}</small>
+        <small>📅 ${t.data}</small>
         <button onclick="apagar('${doc.id}')">❌</button>
       </div>
     `;
@@ -147,7 +142,7 @@ async function mostrarHistorico(){
 }
 
 
-// -------- APAGAR --------
+// APAGAR
 async function apagar(id){
   await db.collection("historico").doc(id).delete();
   mostrarHistorico();
