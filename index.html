@@ -3,19 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <title>Toner App</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- 🔥 BLOQUEAR ZOOM + SAFE AREA -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <style>
+
+/* RESET */
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* BODY */
 body{
-  font-family:-apple-system;
+  font-family:-apple-system, BlinkMacSystemFont;
   margin:0;
   background:#f2f2f7;
-  color:black;
-  transition:0.3s;
+  overflow-x:hidden;
+
+  /* SAFE AREA */
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
 }
 
 /* DARK MODE */
@@ -24,18 +37,20 @@ body{
   color:white;
 }
 
+/* CONTAINER */
 .container{
-  padding:20px;
+  padding:16px;
   padding-bottom:120px;
 }
 
+/* INPUTS */
 select,input,button{
   width:100%;
   padding:14px;
-  margin-bottom:10px;
-  border-radius:10px;
+  margin-bottom:12px;
+  border-radius:12px;
   border:1px solid #ccc;
-  box-sizing:border-box;
+  font-size:16px;
 }
 
 /* DARK INPUTS */
@@ -46,22 +61,21 @@ select,input,button{
   border:1px solid #444;
 }
 
+/* BUTTON */
 button{
   background:#007AFF;
   color:white;
   border:none;
+  font-weight:600;
 }
 
-/* DARK BUTTON */
-.dark button{
-  background:#0a84ff;
-}
-
+/* CARD */
 .card{
   background:white;
-  padding:15px;
-  border-radius:15px;
-  margin-bottom:10px;
+  padding:16px;
+  border-radius:18px;
+  margin-bottom:12px;
+  word-wrap:break-word;
 }
 
 /* DARK CARD */
@@ -74,18 +88,25 @@ nav{
   position:fixed;
   bottom:0;
   width:100%;
-  background:white;
+
+  background:rgba(255,255,255,0.95);
+  backdrop-filter:blur(10px);
+
   display:flex;
   justify-content:space-around;
-  padding:12px;
+
+  padding:10px;
+  padding-bottom:env(safe-area-inset-bottom);
+
   border-top:1px solid #ddd;
 }
 
 /* DARK NAV */
 .dark nav{
-  background:#2c2c2e;
+  background:rgba(44,44,46,0.95);
 }
 
+/* NAV BUTTON */
 nav button{
   background:none;
   border:none;
@@ -93,9 +114,20 @@ nav button{
   color:#999;
 }
 
+/* ACTIVE */
 nav button.active{
   color:#007AFF;
 }
+
+small{
+  display:block;
+  color:#666;
+}
+
+.dark small{
+  color:#aaa;
+}
+
 </style>
 </head>
 
@@ -146,16 +178,16 @@ nav button.active{
 <!-- SETTINGS -->
 <div id="settings" style="display:none">
 <h2>Definições</h2>
-<button onclick="toggleDark()">🌙 Alternar modo escuro</button>
+<button onclick="toggleDark()">🌙 Modo escuro</button>
 </div>
 
 </div>
 
 <nav>
-<button onclick="mudarPagina('registo')">➕</button>
-<button onclick="mudarPagina('stock')">📦</button>
-<button onclick="mudarPagina('historico')">📜</button>
-<button onclick="mudarPagina('settings')">⚙️</button>
+<button onclick="mudarPagina('registo', this)">➕</button>
+<button onclick="mudarPagina('stock', this)">📦</button>
+<button onclick="mudarPagina('historico', this)">📜</button>
+<button onclick="mudarPagina('settings', this)">⚙️</button>
 </nav>
 
 <script src="app.js"></script>
