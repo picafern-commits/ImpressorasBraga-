@@ -1,4 +1,4 @@
-// FIREBASE (OS TEUS DADOS)
+// FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyCSgw4rhBLW5mq4QClulubf6e0hf5lDJbo",
   authDomain: "toner-manager-756c4.firebaseapp.com",
@@ -23,21 +23,14 @@ function mudarPagina(p, btn){
   });
 
   if(btn) btn.classList.add("active");
-
-  if(p==="stock") mostrarStock();
-  if(p==="historico") mostrarHistorico();
 }
 window.mudarPagina = mudarPagina;
 
 
-// DARK MODE
+// DARK
 function toggleDark(){
-
   document.body.classList.toggle("dark");
-
-  localStorage.setItem("modo",
-    document.body.classList.contains("dark") ? "dark":"light"
-  );
+  localStorage.setItem("modo", document.body.classList.contains("dark")?"dark":"light");
 }
 window.toggleDark = toggleDark;
 
@@ -50,6 +43,9 @@ window.onload = ()=>{
   }
 
   document.getElementById("registo").style.display="block";
+
+  mostrarStock();
+  mostrarHistorico();
 };
 
 
@@ -61,7 +57,7 @@ async function disponivel(){
   let cor = document.getElementById("cor").value;
   let data = document.getElementById("data").value;
 
-  if(!eq || !loc || !cor || !data){
+  if(!eq || !loc || !cor){
     alert("Preenche tudo!");
     return;
   }
@@ -70,7 +66,7 @@ async function disponivel(){
     equipamento:eq,
     localizacao:loc,
     cor:cor,
-    data:data
+    data:data || new Date().toISOString().split("T")[0]
   });
 
   alert("Guardado!");
@@ -78,73 +74,22 @@ async function disponivel(){
 window.disponivel = disponivel;
 
 
-// STOCK
-async function mostrarStock(){
+// STOCK (TEMPO REAL)
+function mostrarStock(){
 
-  let lista = document.getElementById("listaStock");
-  lista.innerHTML="";
+  const lista = document.getElementById("listaStock");
 
-  let snap = await db.collection("stock").get();
+  db.collection("stock").onSnapshot(snapshot=>{
 
-  snap.forEach(doc=>{
-    let t = doc.data();
+    lista.innerHTML="";
 
-    lista.innerHTML+=`
-      <div class="card">
-        ${t.equipamento} - ${t.cor}<br>
-        <small>📍 ${t.localizacao}</small>
-        <small>📅 ${t.data}</small>
-        <input type="checkbox" onchange="usar('${doc.id}')">
-      </div>
-    `;
-  });
-}
+    snapshot.forEach(doc=>{
+      let t = doc.data();
 
+      lista.innerHTML+=`
+        <div class="card">
+          ${t.equipamento} - ${t.cor}
+          <small>📍 ${t.localizacao}</small>
+          <small>📅 ${t.data}</small>
 
-// USAR
-async function usar(id){
-
-  let ref = db.collection("stock").doc(id);
-  let snap = await ref.get();
-
-  await db.collection("historico").add({
-    ...snap.data(),
-    usadoEm:new Date().toISOString()
-  });
-
-  await ref.delete();
-
-  mostrarStock();
-}
-window.usar = usar;
-
-
-// HISTÓRICO
-async function mostrarHistorico(){
-
-  let lista = document.getElementById("listaHistorico");
-  lista.innerHTML="";
-
-  let snap = await db.collection("historico").get();
-
-  snap.forEach(doc=>{
-    let t = doc.data();
-
-    lista.innerHTML+=`
-      <div class="card">
-        ${t.equipamento} - ${t.cor}
-        <small>📍 ${t.localizacao}</small>
-        <small>📅 ${t.data}</small>
-        <button onclick="apagar('${doc.id}')">❌</button>
-      </div>
-    `;
-  });
-}
-
-
-// APAGAR
-async function apagar(id){
-  await db.collection("historico").doc(id).delete();
-  mostrarHistorico();
-}
-window.apagar = apagar;
+          <input type="
