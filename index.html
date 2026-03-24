@@ -4,56 +4,42 @@
 <meta charset="UTF-8">
 <title>Toner App</title>
 
-<!-- 🔥 BLOQUEAR ZOOM + SAFE AREA -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <style>
+*{box-sizing:border-box;}
 
-/* RESET */
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* BODY */
 body{
-  font-family:-apple-system, BlinkMacSystemFont;
+  font-family:-apple-system;
   margin:0;
   background:#f2f2f7;
-  overflow-x:hidden;
-
-  /* SAFE AREA */
-  padding-top:env(safe-area-inset-top);
-  padding-bottom:env(safe-area-inset-bottom);
+  padding-bottom:100px;
 }
 
-/* DARK MODE */
 .dark{
   background:#1c1c1e;
   color:white;
 }
 
-/* CONTAINER */
 .container{
   padding:16px;
-  padding-bottom:120px;
 }
 
-/* INPUTS */
 select,input,button{
   width:100%;
   padding:14px;
   margin-bottom:12px;
   border-radius:12px;
   border:1px solid #ccc;
-  font-size:16px;
 }
 
-/* DARK INPUTS */
+#data{
+  max-width:200px;
+}
+
 .dark select,
 .dark input{
   background:#2c2c2e;
@@ -61,52 +47,37 @@ select,input,button{
   border:1px solid #444;
 }
 
-/* BUTTON */
 button{
   background:#007AFF;
   color:white;
   border:none;
-  font-weight:600;
 }
 
-/* CARD */
 .card{
   background:white;
   padding:16px;
   border-radius:18px;
   margin-bottom:12px;
-  word-wrap:break-word;
 }
 
-/* DARK CARD */
 .dark .card{
   background:#2c2c2e;
 }
 
-/* NAV */
 nav{
   position:fixed;
   bottom:0;
   width:100%;
-
-  background:rgba(255,255,255,0.95);
-  backdrop-filter:blur(10px);
-
+  background:white;
   display:flex;
   justify-content:space-around;
-
-  padding:10px;
-  padding-bottom:env(safe-area-inset-bottom);
-
-  border-top:1px solid #ddd;
+  padding:12px;
 }
 
-/* DARK NAV */
 .dark nav{
-  background:rgba(44,44,46,0.95);
+  background:#2c2c2e;
 }
 
-/* NAV BUTTON */
 nav button{
   background:none;
   border:none;
@@ -114,7 +85,6 @@ nav button{
   color:#999;
 }
 
-/* ACTIVE */
 nav button.active{
   color:#007AFF;
 }
@@ -127,7 +97,6 @@ small{
 .dark small{
   color:#aaa;
 }
-
 </style>
 </head>
 
@@ -135,7 +104,6 @@ small{
 
 <div class="container">
 
-<!-- REGISTO -->
 <div id="registo">
 <h2>Registo</h2>
 
@@ -148,14 +116,34 @@ small{
 
 <select id="localizacao">
 <option value="">Localização</option>
+
 <option>Ilha 1 - R4B2229805</option>
 <option>Ilha 2 - WD44336210</option>
+<option>Ilha 3 - R4B1395508</option>
+<option>Ilha 4 - R4B1293179</option>
+<option>Ilha 5 - R4B1293180</option>
+
+<option>Balcão 1 - R4B1293183</option>
+<option>Balcão 2 - R4B1293184</option>
+
+<option>Dep.Logistica - R4B2230012</option>
+<option>Grandes.Encomendas - R4B1293173</option>
+<option>Devoluções - R4B1395261</option>
+
+<option>Escritório - RVP0ZZ03770</option>
+
+<option>Ilha1-VRL - R4B1293169</option>
+<option>Ilha2-VRL - R4B1293174</option>
+<option>Ilha3-VRL - RVP0Z03715</option>
+
 </select>
 
 <select id="cor">
 <option value="">Cor</option>
 <option>Preto</option>
 <option>Cyan</option>
+<option>Magenta</option>
+<option>Amarelo</option>
 </select>
 
 <input type="date" id="data">
@@ -163,19 +151,16 @@ small{
 <button onclick="disponivel()">Disponível</button>
 </div>
 
-<!-- STOCK -->
 <div id="stock" style="display:none">
 <h2>Stock</h2>
 <div id="listaStock"></div>
 </div>
 
-<!-- HISTÓRICO -->
 <div id="historico" style="display:none">
 <h2>Histórico</h2>
 <div id="listaHistorico"></div>
 </div>
 
-<!-- SETTINGS -->
 <div id="settings" style="display:none">
 <h2>Definições</h2>
 <button onclick="toggleDark()">🌙 Modo escuro</button>
