@@ -3,24 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <title>Toner App</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <style>
-
 body{
   font-family:-apple-system;
   margin:0;
   background:#f2f2f7;
-  transition:0.3s;
-}
-
-.dark{
-  background:#1c1c1e;
-  color:white;
 }
 
 .container{
@@ -28,15 +21,13 @@ body{
   padding-bottom:120px;
 }
 
-/* INPUTS */
 select,input,button{
   width:100%;
   padding:14px;
   margin-bottom:10px;
   border-radius:10px;
   border:1px solid #ccc;
-  font-size:16px;
-  box-sizing:border-box; /* 🔥 evita sair do ecrã */
+  box-sizing:border-box;
 }
 
 button{
@@ -45,7 +36,6 @@ button{
   border:none;
 }
 
-/* CARDS */
 .card{
   background:white;
   padding:15px;
@@ -53,26 +43,80 @@ button{
   margin-bottom:10px;
 }
 
-.dark .card{
-  background:#2c2c2e;
-}
-
-.card-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.delete{
-  background:red;
-  color:white;
-  border:none;
-  border-radius:50%;
-  width:30px;
-  height:30px;
-  font-size:16px;
-}
-
-/* NAV */
 nav{
-  position
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:white;
+  display:flex;
+  justify-content:space-around;
+  padding:12px;
+}
+
+nav button{
+  background:none;
+  border:none;
+  font-size:22px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div id="registo">
+<h2>Registo</h2>
+
+<select id="equipamento">
+<option value="">Equipamento</option>
+<option>P3155DN</option>
+<option>TASKalfa_255ci</option>
+<option>PA5500x</option>
+</select>
+
+<select id="localizacao">
+<option value="">Localização</option>
+<option>Ilha 1 - R4B2229805</option>
+<option>Ilha 2 - WD44336210</option>
+</select>
+
+<select id="cor">
+<option value="">Cor</option>
+<option>Preto</option>
+<option>Cyan</option>
+</select>
+
+<input type="date" id="data">
+
+<button onclick="disponivel()">Disponível</button>
+</div>
+
+<div id="stock" style="display:none">
+<h2>Stock</h2>
+<div id="listaStock"></div>
+</div>
+
+<div id="historico" style="display:none">
+<h2>Histórico</h2>
+<div id="listaHistorico"></div>
+</div>
+
+<div id="settings" style="display:none">
+<h2>Definições</h2>
+<button onclick="toggleDark()">Modo escuro</button>
+</div>
+
+</div>
+
+<nav>
+<button onclick="mudarPagina('registo')">➕</button>
+<button onclick="mudarPagina('stock')">📦</button>
+<button onclick="mudarPagina('historico')">📜</button>
+<button onclick="mudarPagina('settings')">⚙️</button>
+</nav>
+
+<script src="app.js"></script>
+
+</body>
+</html>
