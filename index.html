@@ -18,6 +18,11 @@ body{
   background:#f2f2f7;
 }
 
+.dark{
+  background:#1c1c1e;
+  color:white;
+}
+
 .container{
   padding:16px;
   padding-bottom:120px;
@@ -32,6 +37,10 @@ nav{
   background:white;
   padding:10px;
   border-top:1px solid #ddd;
+}
+
+.dark nav{
+  background:#2c2c2e;
 }
 
 nav button{
@@ -53,11 +62,28 @@ select,input,button{
   border:1px solid #ccc;
 }
 
+.dark select,
+.dark input{
+  background:#2c2c2e;
+  color:white;
+  border:1px solid #444;
+}
+
+button{
+  background:#007AFF;
+  color:white;
+  border:none;
+}
+
 .card{
   background:white;
   padding:16px;
   border-radius:16px;
   margin-bottom:12px;
+}
+
+.dark .card{
+  background:#2c2c2e;
 }
 
 .check{
@@ -81,9 +107,45 @@ select,input,button{
 
 <h2>Impressoras</h2>
 
-<input id="equipamento" placeholder="Equipamento">
-<input id="localizacao" placeholder="Localização">
-<input id="cor" placeholder="Cor">
+<select id="equipamento">
+<option value="">Equipamento</option>
+<option>P3155DN</option>
+<option>TASKalfa_255ci</option>
+<option>PA5500x</option>
+</select>
+
+<select id="localizacao">
+<option value="">Localização</option>
+
+<option>Ilha 1</option>
+<option>Ilha 2</option>
+<option>Ilha 3</option>
+<option>Ilha 4</option>
+<option>Ilha 5</option>
+
+<option>Balcão 1</option>
+<option>Balcão 2</option>
+
+<option>Dep.Logistica</option>
+<option>Grandes.Encomendas</option>
+<option>Devoluções</option>
+
+<option>Escritório</option>
+
+<option>Ilha1 VRL</option>
+<option>Ilha2 VRL</option>
+<option>Ilha3 VRL</option>
+
+</select>
+
+<select id="cor">
+<option value="">Cor</option>
+<option>Preto</option>
+<option>Amarelo</option>
+<option>Vermelho</option>
+<option>Azul</option>
+</select>
+
 <input type="date" id="data">
 
 <button onclick="disponivel()">Disponível</button>
@@ -96,10 +158,10 @@ select,input,button{
 
 </div>
 
-<!-- INSTALAÇÃO PC -->
+<!-- INSTALAÇÃO -->
 <div id="instalacao" style="display:none">
 
-<h2>Instalação Computador</h2>
+<h2>Instalação PC</h2>
 
 <input id="nomePC" placeholder="Nome do Computador">
 
@@ -112,11 +174,21 @@ select,input,button{
 
 </div>
 
+<!-- CONFIG -->
+<div id="config" style="display:none">
+
+<h2>Configurações</h2>
+
+<button onclick="toggleDark()">🌙 Dark Mode</button>
+
+</div>
+
 </div>
 
 <nav>
 <button onclick="mudarPagina('impressoras', this)">🖨️</button>
 <button onclick="mudarPagina('instalacao', this)">💻</button>
+<button onclick="mudarPagina('config', this)">⚙️</button>
 </nav>
 
 <script src="app.js"></script>
