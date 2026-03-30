@@ -16,10 +16,11 @@ html, body{
   background:#f2f2f7;
   overflow-x:hidden;
   touch-action:pan-y;
+  overscroll-behavior-x:none;
   transition:0.3s;
 }
 
-/* DARK */
+/* DARK MODE */
 .dark{
   background:#1c1c1e;
   color:white;
@@ -176,27 +177,19 @@ input:checked + .slider:before {
 
 <button onclick="disponivel()">Disponível</button>
 
+<h3>Usar Toner</h3>
+
+<select id="selectStock">
+<option value="">Selecionar toner do stock</option>
+</select>
+
+<button onclick="usarSelecionado()">Usado</button>
+
 <h3>Stock</h3>
 <div id="listaStock"></div>
 
 <h3>Histórico</h3>
 <div id="listaHistorico"></div>
-
-</div>
-
-<!-- INSTALAÇÃO -->
-<div id="instalacao" style="display:none">
-
-<h2>Instalação PC</h2>
-
-<input id="nomePC" placeholder="Nome do Computador">
-
-<div id="checklist"></div>
-
-<button onclick="guardarInstalacao()">Guardar</button>
-
-<h3>Histórico Instalações</h3>
-<div id="listaPC"></div>
 
 </div>
 
@@ -221,7 +214,6 @@ input:checked + .slider:before {
 
 <nav>
 <button onclick="mudarPagina('impressoras', this)">🖨️</button>
-<button onclick="mudarPagina('instalacao', this)">💻</button>
 <button onclick="mudarPagina('config', this)">⚙️</button>
 </nav>
 
