@@ -8,12 +8,21 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// NAV
-function mudarPagina(p){
-  ["impressoras","instalacao","historicoPC"].forEach(x=>{
-    document.getElementById(x).style.display="none";
+
+// -------- NAV --------
+function mudarPagina(p, btn){
+
+  ["impressoras","instalacao","historicoPC"].forEach(id=>{
+    document.getElementById(id).style.display="none";
   });
+
   document.getElementById(p).style.display="block";
+
+  document.querySelectorAll("nav button").forEach(b=>{
+    b.classList.remove("active");
+  });
+
+  if(btn) btn.classList.add("active");
 }
 window.mudarPagina = mudarPagina;
 
@@ -35,68 +44,74 @@ async function disponivel(){
     equipamento:eq,
     localizacao:loc,
     cor:cor,
-    data:data
+    data:data || new Date().toISOString().split("T")[0]
   });
 }
 window.disponivel = disponivel;
 
 
-// STOCK
+// STOCK (TEMPO REAL)
 function mostrarStock(){
 
-  db.collection("stock").onSnapshot(snapshot=>{
+  db.collection("stock").onSnapshot(snap=>{
+
     let lista = document.getElementById("listaStock");
     lista.innerHTML="";
 
-    snapshot.forEach(doc=>{
+    snap.forEach(doc=>{
       let t = doc.data();
 
       lista.innerHTML+=`
         <div class="card">
-          ${t.equipamento} - ${t.cor}
-          <br>${t.localizacao}
-          <br>${t.data}
+          ${t.equipamento} - ${t.cor}<br>
+          📍 ${t.localizacao}<br>
+          📅 ${t.data}
           <input type="checkbox" onchange="usar('${doc.id}')">
         </div>
       `;
     });
+
   });
 }
 
 
-// USAR
+// USAR TONER
 async function usar(id){
+
   let ref = db.collection("stock").doc(id);
   let snap = await ref.get();
 
   await db.collection("historico").add(snap.data());
   await ref.delete();
 }
+window.usar = usar;
 
 
 // HISTÓRICO TONERS
 function mostrarHistorico(){
-  db.collection("historico").onSnapshot(snapshot=>{
+
+  db.collection("historico").onSnapshot(snap=>{
+
     let lista = document.getElementById("listaHistorico");
     lista.innerHTML="";
 
-    snapshot.forEach(doc=>{
+    snap.forEach(doc=>{
       let t = doc.data();
 
       lista.innerHTML+=`
         <div class="card">
-          ${t.equipamento} - ${t.cor}
-          <br>${t.localizacao}
-          <br>${t.data}
+          ${t.equipamento} - ${t.cor}<br>
+          📍 ${t.localizacao}<br>
+          📅 ${t.data}
         </div>
       `;
     });
+
   });
 }
 
 
 // -------- INSTALAÇÃO PC --------
-
 const passos = [
 "TEAMVIEWER HOST",
 "TEAMS",
@@ -113,6 +128,7 @@ const passos = [
 ];
 
 function carregarChecklist(){
+
   let html="";
 
   passos.forEach((p,i)=>{
@@ -128,17 +144,17 @@ function carregarChecklist(){
 }
 
 
-// GUARDAR PC
+// GUARDAR INSTALAÇÃO
 async function guardarInstalacao(){
 
   let nome = document.getElementById("nomePC").value;
 
   if(!nome){
-    alert("Nome do PC obrigatório");
+    alert("Nome obrigatório");
     return;
   }
 
-  let dados = [];
+  let dados=[];
 
   passos.forEach((p,i)=>{
     dados.push({
@@ -153,7 +169,7 @@ async function guardarInstalacao(){
     data:new Date().toLocaleDateString()
   });
 
-  alert("Guardado!");
+  alert("Instalação guardada!");
 }
 window.guardarInstalacao = guardarInstalacao;
 
@@ -161,16 +177,17 @@ window.guardarInstalacao = guardarInstalacao;
 // HISTÓRICO PC
 function mostrarHistoricoPC(){
 
-  db.collection("instalacoes").onSnapshot(snapshot=>{
+  db.collection("instalacoes").onSnapshot(snap=>{
+
     let lista = document.getElementById("listaPC");
     lista.innerHTML="";
 
-    snapshot.forEach(doc=>{
+    snap.forEach(doc=>{
       let d = doc.data();
 
       let passosHTML="";
       d.passos.forEach(p=>{
-        passosHTML += `<small>${p.feito ? "✔" : "❌"} ${p.passo}</small>`;
+        passosHTML += `<div>${p.feito ? "✔" : "❌"} ${p.passo}</div>`;
       });
 
       lista.innerHTML+=`
@@ -180,14 +197,17 @@ function mostrarHistoricoPC(){
         </div>
       `;
     });
+
   });
 }
 
 
-// START
+// -------- START --------
 window.onload = ()=>{
+  carregarChecklist();
   mostrarStock();
   mostrarHistorico();
   mostrarHistoricoPC();
-  carregarChecklist();
+
+  document.querySelector("nav button").classList.add("active");
 };
