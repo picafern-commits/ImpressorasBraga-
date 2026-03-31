@@ -9,13 +9,20 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 
-// 🔥 GARANTE QUE OS BOTÕES FUNCIONAM
-window.mudarPagina = function(p){
+// NAV
+window.mudarPagina = function(p, btn){
 
-  document.getElementById("impressoras").style.display="none";
-  document.getElementById("config").style.display="none";
+  ["impressoras","computadores","config"].forEach(id=>{
+    document.getElementById(id).style.display="none";
+  });
 
   document.getElementById(p).style.display="block";
+
+  document.querySelectorAll("nav button").forEach(b=>{
+    b.classList.remove("active");
+  });
+
+  if(btn) btn.classList.add("active");
 };
 
 
@@ -28,7 +35,7 @@ window.disponivel = async function(){
   let data = document.getElementById("data").value;
 
   if(!eq || !loc || !cor){
-    alert("Preenche tudo!");
+    alert("Preenche todos os campos!");
     return;
   }
 
@@ -36,17 +43,20 @@ window.disponivel = async function(){
     equipamento:eq,
     localizacao:loc,
     cor:cor,
-    data:data
+    data:data || new Date().toISOString().split("T")[0]
   });
 
-  alert("Guardado!");
+  alert("Toner adicionado!");
 };
 
 
-// STOCK
+// STOCK + SELECT
 db.collection("stock").onSnapshot(snap=>{
   let lista = document.getElementById("listaStock");
+  let select = document.getElementById("selectStock");
+
   lista.innerHTML="";
+  select.innerHTML="<option value=''>Selecionar toner</option>";
 
   snap.forEach(doc=>{
     let t = doc.data();
@@ -58,11 +68,35 @@ db.collection("stock").onSnapshot(snap=>{
         ${t.data}
       </div>
     `;
+
+    select.innerHTML+=`
+      <option value="${doc.id}">
+        ${t.equipamento} - ${t.cor}
+      </option>
+    `;
   });
 });
 
 
-// HISTÓRICO
+// USAR TONER
+window.usarSelecionado = async function(){
+
+  let id = document.getElementById("selectStock").value;
+
+  if(!id){
+    alert("Seleciona um toner!");
+    return;
+  }
+
+  let ref = db.collection("stock").doc(id);
+  let snap = await ref.get();
+
+  await db.collection("historico").add(snap.data());
+  await ref.delete();
+};
+
+
+// HISTÓRICO IMPRESSORAS
 db.collection("historico").onSnapshot(snap=>{
   let lista = document.getElementById("listaHistorico");
   lista.innerHTML="";
@@ -72,27 +106,118 @@ db.collection("historico").onSnapshot(snap=>{
 
     lista.innerHTML+=`
       <div class="card">
-        ${t.equipamento} - ${t.cor}
+        ${t.equipamento} - ${t.cor}<br>
+        ${t.localizacao}<br>
+        ${t.data}
         <button class="delete" onclick="apagarHistorico('${doc.id}')">❌</button>
       </div>
     `;
   });
 });
 
-
-// APAGAR
 window.apagarHistorico = async function(id){
   await db.collection("historico").doc(id).delete();
 };
 
 
+// COMPUTADORES
+const passos = [
+"TEAMVIEWER HOST","TEAMS",
+"DNS (192.168.0.204 & 192.168.0.205)",
+"NOME DO SISTEMA",
+"Atribuir Dominio",
+"Desinstalar MCFee",
+"Instalar Sophos",
+"MICROSOFT 365",
+"Instalar Impressora",
+"Alterar Energia",
+"Apagar User",
+"Criar novo user"
+];
+
+function carregarChecklist(){
+  let html="";
+  passos.forEach((p,i)=>{
+    html+=`
+      <div class="card">
+        <input type="checkbox" id="p${i}"> ${p}
+      </div>
+    `;
+  });
+  document.getElementById("checklist").innerHTML=html;
+}
+
+
+// GUARDAR PC
+window.guardarPC = async function(){
+
+  let nome = document.getElementById("nomePC").value;
+
+  if(!nome){
+    alert("Nome obrigatório!");
+    return;
+  }
+
+  let dados=[];
+  passos.forEach((p,i)=>{
+    dados.push({
+      passo:p,
+      feito:document.getElementById("p"+i).checked
+    });
+  });
+
+  await db.collection("pcs").add({
+    nome:nome,
+    passos:dados,
+    data:new Date().toLocaleDateString()
+  });
+
+  alert("Instalação guardada!");
+};
+
+
+// HISTÓRICO PCs
+db.collection("pcs").onSnapshot(snap=>{
+  let lista=document.getElementById("listaPC");
+  lista.innerHTML="";
+
+  snap.forEach(doc=>{
+    let d=doc.data();
+
+    let html="";
+    d.passos.forEach(p=>{
+      html+=`<div>${p.feito?"✔":"❌"} ${p.passo}</div>`;
+    });
+
+    lista.innerHTML+=`
+      <div class="card">
+        <b>${d.nome}</b><br>
+        ${html}
+        <button class="delete" onclick="apagarPC('${doc.id}')">❌</button>
+      </div>
+    `;
+  });
+});
+
+window.apagarPC = async function(id){
+  await db.collection("pcs").doc(id).delete();
+};
+
+
 // DARK MODE
-window.onload = function(){
+window.onload = ()=>{
 
   let sw = document.getElementById("darkSwitch");
 
+  if(localStorage.getItem("modo")==="dark"){
+    document.body.classList.add("dark");
+    sw.checked=true;
+  }
+
   sw.addEventListener("change", function(){
     document.body.classList.toggle("dark", this.checked);
+    localStorage.setItem("modo", this.checked?"dark":"light");
   });
 
+  carregarChecklist();
 };
