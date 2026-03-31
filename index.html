@@ -10,23 +10,40 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <style>
-body{
+html, body{
   margin:0;
   font-family:-apple-system;
   background:#f2f2f7;
+  overflow-x:hidden;
 }
 
-/* DARK */
+/* DARK MODE */
 .dark{
   background:#1c1c1e;
   color:white;
 }
 
-.container{
-  padding:15px;
-  padding-bottom:100px;
+.dark nav{
+  background:#2c2c2e;
 }
 
+.dark .card{
+  background:#2c2c2e;
+}
+
+.dark select,
+.dark input{
+  background:#2c2c2e;
+  color:white;
+  border:1px solid #444;
+}
+
+.container{
+  padding:15px;
+  padding-bottom:120px;
+}
+
+/* NAV */
 nav{
   position:fixed;
   bottom:0;
@@ -35,23 +52,42 @@ nav{
   justify-content:space-around;
   background:white;
   padding:10px;
+  padding-bottom:env(safe-area-inset-bottom);
+  border-top:1px solid #ddd;
+}
+
+nav button{
+  background:none;
+  border:none;
+  font-size:22px;
+}
+
+.active{
+  color:#007AFF;
+}
+
+select,input,button{
+  width:100%;
+  padding:14px;
+  margin-bottom:10px;
+  border-radius:10px;
 }
 
 button{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
+  background:#007AFF;
+  color:white;
 }
 
 .card{
   background:white;
-  padding:10px;
-  margin-top:10px;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:10px;
 }
 
 .delete{
   background:red;
-  color:white;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -77,6 +113,17 @@ button{
 <option>Ilha 1 - R4B2229805</option>
 <option>Ilha 2 - WD44336210</option>
 <option>Ilha 3 - R4B1395508</option>
+<option>Ilha 4 - R4B1293179</option>
+<option>Ilha 5 - R4B1293180</option>
+<option>Balcão 1 - R4B1293183</option>
+<option>Balcão 2 - R4B1293184</option>
+<option>Dep.Logistica - R4B2230012</option>
+<option>Grandes.Encomendas - R4B1293173</option>
+<option>Devoluções - R4B1395261</option>
+<option>Escritório - RVP0ZZ03770</option>
+<option>Ilha1-VRL - R4B1293169</option>
+<option>Ilha2-VRL - R4B1293174</option>
+<option>Ilha3-VRL - RVP0Z03715</option>
 </select>
 
 <select id="cor">
@@ -89,7 +136,11 @@ button{
 
 <input type="date" id="data">
 
-<button onclick="disponivel()">Disponível</button>
+<button onclick="disponivel()">Adicionar ao Stock</button>
+
+<h3>Usar Toner</h3>
+<select id="selectStock"></select>
+<button onclick="usarSelecionado()">Marcar como Usado</button>
 
 <h3>Stock</h3>
 <div id="listaStock"></div>
@@ -99,9 +150,26 @@ button{
 
 </div>
 
+<!-- COMPUTADORES -->
+<div id="computadores" style="display:none">
+
+<h2>Instalação Computador</h2>
+
+<input id="nomePC" placeholder="Nome do Computador">
+
+<div id="checklist"></div>
+
+<button onclick="guardarPC()">Guardar Instalação</button>
+
+<h3>Histórico PCs</h3>
+<div id="listaPC"></div>
+
+</div>
+
 <!-- CONFIG -->
 <div id="config" style="display:none">
-<h2>Config</h2>
+
+<h2>Configurações</h2>
 
 <label>
 <input type="checkbox" id="darkSwitch"> Dark Mode
@@ -112,8 +180,9 @@ button{
 </div>
 
 <nav>
-<button onclick="mudarPagina('impressoras')">🖨️</button>
-<button onclick="mudarPagina('config')">⚙️</button>
+<button onclick="mudarPagina('impressoras', this)">🖨️</button>
+<button onclick="mudarPagina('computadores', this)">💻</button>
+<button onclick="mudarPagina('config', this)">⚙️</button>
 </nav>
 
 <script src="app.js"></script>
