@@ -9,8 +9,35 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 
+// GARANTIR QUE TUDO EXISTE
+window.onload = function(){
+
+  carregarChecklist();
+
+  // NAV ATIVO
+  document.querySelectorAll("nav button")[0].classList.add("active");
+
+  // DARK MODE
+  const sw = document.getElementById("darkSwitch");
+
+  if(localStorage.getItem("modo")==="dark"){
+    document.body.classList.add("dark");
+    if(sw) sw.checked = true;
+  }
+
+  if(sw){
+    sw.addEventListener("change", function(){
+      document.body.classList.toggle("dark", this.checked);
+      localStorage.setItem("modo", this.checked ? "dark":"light");
+    });
+  }
+
+};
+
+
 // NAV
 window.mudarPagina = function(p, btn){
+
   ["impressoras","computadores","config"].forEach(id=>{
     document.getElementById(id).style.display="none";
   });
@@ -21,15 +48,15 @@ window.mudarPagina = function(p, btn){
     b.classList.remove("active");
   });
 
-  btn.classList.add("active");
+  if(btn) btn.classList.add("active");
 };
 
 
 // TONER
 window.disponivel = async function(){
 
-  let eq = equipamento.value;
-  let loc = localizacao.value;
+  let eq = document.getElementById("equipamento").value;
+  let loc = document.getElementById("localizacao").value;
   let cor = document.getElementById("cor").value;
   let data = document.getElementById("data").value;
 
@@ -47,10 +74,13 @@ window.disponivel = async function(){
 };
 
 
-// STOCK + SELECT
+// STOCK
 db.collection("stock").onSnapshot(snap=>{
+
   let lista = document.getElementById("listaStock");
   let select = document.getElementById("selectStock");
+
+  if(!lista || !select) return;
 
   lista.innerHTML="";
   select.innerHTML="<option value=''>Selecionar toner</option>";
@@ -72,10 +102,11 @@ db.collection("stock").onSnapshot(snap=>{
       </option>
     `;
   });
+
 });
 
 
-// USAR TONER
+// USAR
 window.usarSelecionado = async function(){
 
   let id = document.getElementById("selectStock").value;
@@ -88,14 +119,22 @@ window.usarSelecionado = async function(){
   let ref = db.collection("stock").doc(id);
   let snap = await ref.get();
 
+  if(!snap.exists){
+    alert("Erro no toner");
+    return;
+  }
+
   await db.collection("historico").add(snap.data());
   await ref.delete();
 };
 
 
-// HISTÓRICO IMPRESSORAS
+// HISTÓRICO
 db.collection("historico").onSnapshot(snap=>{
+
   let lista = document.getElementById("listaHistorico");
+  if(!lista) return;
+
   lista.innerHTML="";
 
   snap.forEach(doc=>{
@@ -110,7 +149,9 @@ db.collection("historico").onSnapshot(snap=>{
       </div>
     `;
   });
+
 });
+
 
 window.apagarHistorico = async function(id){
   await db.collection("historico").doc(id).delete();
@@ -119,31 +160,30 @@ window.apagarHistorico = async function(id){
 
 // COMPUTADORES
 const passos = [
-"TEAMVIEWER HOST",
-"TEAMS",
-"DNS (192.168.0.204 & 192.168.0.205)",
-"NOME DO SISTEMA",
-"Atribuir Dominio",
-"Desinstalar MCFee",
-"Instalar Sophos",
-"MICROSOFT 365",
-"Instalar Impressora",
-"Alterar Energia",
-"Apagar User",
-"Criar novo user"
+"TEAMVIEWER HOST","TEAMS",
+"DNS","Sistema",
+"Dominio","MCFee",
+"Sophos","Office",
+"Impressora","Energia",
+"Apagar User","Criar User"
 ];
 
 function carregarChecklist(){
+
+  let el = document.getElementById("checklist");
+  if(!el) return;
+
   let html="";
+
   passos.forEach((p,i)=>{
     html+=`
-      <div class="card" style="display:flex;justify-content:space-between;">
-        <span>${p}</span>
-        <input type="checkbox" id="p${i}">
+      <div class="card">
+        <input type="checkbox" id="p${i}"> ${p}
       </div>
     `;
   });
-  document.getElementById("checklist").innerHTML=html;
+
+  el.innerHTML = html;
 }
 
 
@@ -158,6 +198,7 @@ window.guardarPC = async function(){
   }
 
   let dados=[];
+
   passos.forEach((p,i)=>{
     dados.push({
       passo:p,
@@ -167,8 +208,7 @@ window.guardarPC = async function(){
 
   await db.collection("pcs").add({
     nome:nome,
-    passos:dados,
-    data:new Date().toLocaleDateString()
+    passos:dados
   });
 
   alert("Guardado!");
@@ -177,15 +217,18 @@ window.guardarPC = async function(){
 
 // HISTÓRICO PCs
 db.collection("pcs").onSnapshot(snap=>{
-  let lista=document.getElementById("listaPC");
+
+  let lista = document.getElementById("listaPC");
+  if(!lista) return;
+
   lista.innerHTML="";
 
   snap.forEach(doc=>{
-    let d=doc.data();
+    let d = doc.data();
 
     let html="";
     d.passos.forEach(p=>{
-      html+=`<div>${p.feito?"✔":"❌"} ${p.passo}</div>`;
+      html+=`<div>${p.feito ? "✔":"❌"} ${p.passo}</div>`;
     });
 
     lista.innerHTML+=`
@@ -196,17 +239,9 @@ db.collection("pcs").onSnapshot(snap=>{
       </div>
     `;
   });
+
 });
 
 window.apagarPC = async function(id){
   await db.collection("pcs").doc(id).delete();
 };
-
-
-// DARK MODE
-window.onload = ()=>{
-
-  let sw = document.getElementById("darkSwitch");
-
-  if(localStorage.getItem("modo")==="dark"){
-    document.body.classList.add("dark");
