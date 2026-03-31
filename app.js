@@ -8,216 +8,141 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+let todosStock=[];
+
 
 // NAV
-window.mudarPagina = function(p, btn){
-
-  ["impressoras","computadores","config"].forEach(id=>{
-    document.getElementById(id).style.display="none";
-  });
-
+window.mudarPagina = function(p){
+  document.getElementById("impressoras").style.display="none";
+  document.getElementById("config").style.display="none";
   document.getElementById(p).style.display="block";
-
-  document.querySelectorAll("nav button").forEach(b=>{
-    b.classList.remove("active");
-  });
-
-  if(btn) btn.classList.add("active");
 };
 
 
-// TONER
+// BOTÃO HOJE
+window.hoje = function(){
+  document.getElementById("data").value = new Date().toISOString().split("T")[0];
+};
+
+
+// DISPONIVEL
 window.disponivel = async function(){
 
-  let eq = document.getElementById("equipamento").value;
-  let loc = document.getElementById("localizacao").value;
-  let cor = document.getElementById("cor").value;
+  let eq = equipamento.value;
+  let loc = localizacao.value;
+  let cor = cor.value;
   let data = document.getElementById("data").value;
 
-  if(!eq || !loc || !cor){
-    alert("Preenche todos os campos!");
+  if(!loc) loc="Sem Localização";
+  if(!data) data="Não tem Data";
+
+  if(!eq || !cor){
+    alert("Preenche equipamento e cor");
     return;
   }
 
-  await db.collection("stock").add({
-    equipamento:eq,
-    localizacao:loc,
-    cor:cor,
-    data:data || new Date().toISOString().split("T")[0]
-  });
+  localStorage.setItem("ultimaLoc", loc);
 
-  alert("Toner adicionado!");
+  await db.collection("stock").add({equipamento:eq,localizacao:loc,cor,data});
 };
 
 
-// STOCK + SELECT
+// STOCK
 db.collection("stock").onSnapshot(snap=>{
-  let lista = document.getElementById("listaStock");
-  let select = document.getElementById("selectStock");
-
-  lista.innerHTML="";
-  select.innerHTML="<option value=''>Selecionar toner</option>";
+  todosStock=[];
+  let filtroSet=new Set();
 
   snap.forEach(doc=>{
-    let t = doc.data();
-
-    lista.innerHTML+=`
-      <div class="card">
-        ${t.equipamento} - ${t.cor}<br>
-        ${t.localizacao}<br>
-        ${t.data}
-      </div>
-    `;
-
-    select.innerHTML+=`
-      <option value="${doc.id}">
-        ${t.equipamento} - ${t.cor}
-      </option>
-    `;
+    let t=doc.data();
+    t.id=doc.id;
+    todosStock.push(t);
+    filtroSet.add(t.localizacao);
   });
+
+  atualizarFiltro([...filtroSet]);
+  mostrarStock(todosStock);
 });
 
 
-// USAR TONER
-window.usarSelecionado = async function(){
+// FILTRO
+function atualizarFiltro(lista){
+  let f=document.getElementById("filtro");
+  f.innerHTML="<option value=''>Todas</option>";
+  lista.forEach(l=>{
+    f.innerHTML+=`<option>${l}</option>`;
+  });
+}
 
-  let id = document.getElementById("selectStock").value;
+window.filtrar = function(){
+  let val=document.getElementById("filtro").value;
 
-  if(!id){
-    alert("Seleciona um toner!");
-    return;
+  if(!val){
+    mostrarStock(todosStock);
+  }else{
+    mostrarStock(todosStock.filter(t=>t.localizacao===val));
   }
-
-  let ref = db.collection("stock").doc(id);
-  let snap = await ref.get();
-
-  await db.collection("historico").add(snap.data());
-  await ref.delete();
 };
 
 
-// HISTÓRICO IMPRESSORAS
-db.collection("historico").onSnapshot(snap=>{
-  let lista = document.getElementById("listaHistorico");
-  lista.innerHTML="";
+// MOSTRAR STOCK
+function mostrarStock(lista){
+  let div=document.getElementById("listaStock");
+  div.innerHTML="";
 
-  snap.forEach(doc=>{
-    let t = doc.data();
-
-    lista.innerHTML+=`
+  lista.forEach(t=>{
+    div.innerHTML+=`
       <div class="card">
         ${t.equipamento} - ${t.cor}<br>
         ${t.localizacao}<br>
         ${t.data}
-        <button class="delete" onclick="apagarHistorico('${doc.id}')">❌</button>
+      </div>
+    `;
+  });
+}
+
+
+// HISTÓRICO
+db.collection("historico").onSnapshot(snap=>{
+  let div=document.getElementById("listaHistorico");
+  div.innerHTML="";
+
+  snap.forEach(doc=>{
+    let t=doc.data();
+
+    div.innerHTML+=`
+      <div class="card">
+        ${t.equipamento} - ${t.cor}
+        <button class="delete" onclick="apagar('${doc.id}')">❌</button>
       </div>
     `;
   });
 });
 
-window.apagarHistorico = async function(id){
+window.apagar = async function(id){
   await db.collection("historico").doc(id).delete();
 };
 
 
-// COMPUTADORES
-const passos = [
-"TEAMVIEWER HOST","TEAMS",
-"DNS (192.168.0.204 & 192.168.0.205)",
-"NOME DO SISTEMA",
-"Atribuir Dominio",
-"Desinstalar MCFee",
-"Instalar Sophos",
-"MICROSOFT 365",
-"Instalar Impressora",
-"Alterar Energia",
-"Apagar User",
-"Criar novo user"
-];
-
-function carregarChecklist(){
-  let html="";
-  passos.forEach((p,i)=>{
-    html+=`
-      <div class="card">
-        <input type="checkbox" id="p${i}"> ${p}
-      </div>
-    `;
-  });
-  document.getElementById("checklist").innerHTML=html;
-}
-
-
-// GUARDAR PC
-window.guardarPC = async function(){
-
-  let nome = document.getElementById("nomePC").value;
-
-  if(!nome){
-    alert("Nome obrigatório!");
-    return;
-  }
-
-  let dados=[];
-  passos.forEach((p,i)=>{
-    dados.push({
-      passo:p,
-      feito:document.getElementById("p"+i).checked
-    });
-  });
-
-  await db.collection("pcs").add({
-    nome:nome,
-    passos:dados,
-    data:new Date().toLocaleDateString()
-  });
-
-  alert("Instalação guardada!");
-};
-
-
-// HISTÓRICO PCs
-db.collection("pcs").onSnapshot(snap=>{
-  let lista=document.getElementById("listaPC");
-  lista.innerHTML="";
-
-  snap.forEach(doc=>{
-    let d=doc.data();
-
-    let html="";
-    d.passos.forEach(p=>{
-      html+=`<div>${p.feito?"✔":"❌"} ${p.passo}</div>`;
-    });
-
-    lista.innerHTML+=`
-      <div class="card">
-        <b>${d.nome}</b><br>
-        ${html}
-        <button class="delete" onclick="apagarPC('${doc.id}')">❌</button>
-      </div>
-    `;
-  });
-});
-
-window.apagarPC = async function(id){
-  await db.collection("pcs").doc(id).delete();
-};
-
-
-// DARK MODE
+// DARK MODE + LOCALIZAÇÃO AUTOMÁTICA
 window.onload = ()=>{
 
-  let sw = document.getElementById("darkSwitch");
+  // DARK
+  let sw=document.getElementById("darkSwitch");
 
   if(localStorage.getItem("modo")==="dark"){
     document.body.classList.add("dark");
     sw.checked=true;
   }
 
-  sw.addEventListener("change", function(){
-    document.body.classList.toggle("dark", this.checked);
-    localStorage.setItem("modo", this.checked?"dark":"light");
+  sw.addEventListener("change",function(){
+    document.body.classList.toggle("dark",this.checked);
+    localStorage.setItem("modo",this.checked?"dark":"light");
   });
 
-  carregarChecklist();
+  // LOCALIZAÇÃO AUTOMÁTICA
+  let ultima=localStorage.getItem("ultimaLoc");
+  if(ultima){
+    document.getElementById("localizacao").value=ultima;
+  }
+
 };
