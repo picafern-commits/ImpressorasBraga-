@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-<title>Dashboard Empresa</title>
+<title>App Empresa</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -14,6 +14,7 @@ body{
   margin:0;
   font-family:-apple-system;
   background:#f2f2f7;
+  overflow-x:hidden;
 }
 
 .dark{
@@ -64,11 +65,6 @@ button{
   padding:12px;
   border-radius:12px;
   margin-top:10px;
-  transition:0.2s;
-}
-
-.card:active{
-  transform:scale(0.97);
 }
 
 .dark .card{
@@ -102,7 +98,7 @@ nav button{
 
 <div class="container">
 
-<!-- DASHBOARD -->
+<!-- IMPRESSORAS -->
 <div id="impressoras">
 
 <h2>Dashboard Toners</h2>
@@ -119,7 +115,7 @@ nav button{
   </div>
 </div>
 
-<input id="search" placeholder="Pesquisar ID..." oninput="filtrar()">
+<input id="search" placeholder="Pesquisar por localização..." oninput="filtrar()">
 
 <h3>Adicionar</h3>
 
@@ -133,43 +129,4 @@ nav button{
 <select id="localizacao">
 <option value="">Localização</option>
 <option>Sem Localização</option>
-<option>Ilha 1 - R4B2229805</option>
-<option>Ilha 2 - WD44336210</option>
-<option>Ilha 3 - R4B1395508</option>
-<option>Ilha 4 - R4B1293179</option>
-<option>Ilha 5 - R4B1293180</option>
-<option>Balcão 1 - R4B1293183</option>
-<option>Balcão 2 - R4B1293184</option>
-<option>Dep.Logistica - R4B2230012</option>
-<option>Grandes.Encomendas - R4B1293173</option>
-<option>Devoluções - R4B1395261</option>
-<option>Escritório - RVP0ZZ03770</option>
-<option>Ilha1-VRL - R4B1293169</option>
-<option>Ilha2-VRL - R4B1293174</option>
-<option>Ilha3-VRL - RVP0Z03715</option>
-</select>
-
-<select id="cor">
-<option value="">Cor</option>
-<option>Preto</option>
-<option>Amarelo</option>
-<option>Vermelho</option>
-<option>Azul</option>
-</select>
-
-<input type="date" id="data">
-<button onclick="disponivel()">Adicionar</button>
-
-<h3>Stock</h3>
-<div id="listaStock"></div>
-
-<h3>Histórico</h3>
-<div id="listaHistorico"></div>
-
-</div>
-
-</div>
-
-<script src="app.js"></script>
-</body>
-</html>
+<option>Ilha 1 - R4B2229805</option
