@@ -2,38 +2,87 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>App Empresa</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<title>App Toners</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <style>
-*{box-sizing:border-box;}
+
+/* 🔒 FIXAR APP */
+html, body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow-x:hidden;
+  overflow-y:auto;
+}
 
 body{
-  margin:0;
   font-family:-apple-system;
   background:#f2f2f7;
+  touch-action: pan-y;
+  overscroll-behavior: none;
 }
 
-.dark{
-  background:#1c1c1e;
-  color:white;
-}
-
-.dark .card{ background:#2c2c2e; }
-.dark input,.dark select{
-  background:#2c2c2e;
-  color:white;
-}
-
+/* CONTAINER */
 .container{
   padding:15px;
-  padding-bottom:120px;
+  padding-bottom:110px;
+  max-width:100%;
+  overflow-x:hidden;
 }
 
+/* DASHBOARD */
+.top{
+  display:flex;
+  gap:10px;
+}
+
+.box{
+  flex:1;
+  background:white;
+  padding:15px;
+  border-radius:14px;
+  text-align:center;
+}
+
+.big{
+  font-size:24px;
+  font-weight:bold;
+}
+
+/* INPUTS */
+input, select, button{
+  width:100%;
+  max-width:100%;
+  padding:14px;
+  margin-top:10px;
+  border-radius:12px;
+  border:none;
+}
+
+/* BOTÃO */
+button{
+  background:#007AFF;
+  color:white;
+}
+
+/* CARDS */
+.card{
+  background:white;
+  padding:12px;
+  border-radius:12px;
+  margin-top:10px;
+  max-width:100%;
+  word-wrap:break-word;
+}
+
+/* NAV */
 nav{
   position:fixed;
   bottom:0;
@@ -41,7 +90,7 @@ nav{
   display:flex;
   justify-content:space-around;
   background:white;
-  padding:10px;
+  padding:12px;
 }
 
 nav button{
@@ -50,29 +99,6 @@ nav button{
   font-size:22px;
 }
 
-select,input,button{
-  width:100%;
-  padding:14px;
-  margin-bottom:10px;
-  border-radius:12px;
-}
-
-button{
-  background:#007AFF;
-  color:white;
-}
-
-.card{
-  background:white;
-  padding:15px;
-  border-radius:12px;
-  margin-bottom:10px;
-}
-
-.delete{
-  background:red;
-  margin-top:10px;
-}
 </style>
 </head>
 
@@ -83,7 +109,23 @@ button{
 <!-- IMPRESSORAS -->
 <div id="impressoras">
 
-<h2>Impressoras</h2>
+<h2>Dashboard Toners</h2>
+
+<div class="top">
+  <div class="box">
+    <div id="countStock" class="big">0</div>
+    <div>Stock</div>
+  </div>
+
+  <div class="box">
+    <div id="countUsados" class="big">0</div>
+    <div>Usados</div>
+  </div>
+</div>
+
+<input id="search" placeholder="Pesquisar por localização..." oninput="filtrar()">
+
+<h3>Adicionar</h3>
 
 <select id="equipamento">
 <option value="">Equipamento</option>
@@ -95,9 +137,11 @@ button{
 <select id="localizacao">
 <option value="">Localização</option>
 <option>Sem Localização</option>
-<option>Ilha 1 - R4B2229805</option>
-<option>Ilha 2 - WD44336210</option>
-<option>Ilha 3 - R4B1395508</option>
+<option>Ilha 1</option>
+<option>Ilha 2</option>
+<option>Ilha 3</option>
+<option>Ilha 4</option>
+<option>Ilha 5</option>
 </select>
 
 <select id="cor">
@@ -109,9 +153,8 @@ button{
 </select>
 
 <input type="date" id="data">
-<button onclick="hoje()">Hoje</button>
 
-<button onclick="disponivel()">Adicionar ao Stock</button>
+<button onclick="disponivel()">Adicionar</button>
 
 <h3>Stock</h3>
 <div id="listaStock"></div>
@@ -123,28 +166,19 @@ button{
 
 <!-- COMPUTADORES -->
 <div id="computadores" style="display:none">
-
-<h2>Instalação Computador</h2>
-
-<input id="nomePC" placeholder="Nome do Computador">
-
-<div id="checklist"></div>
-
-<button onclick="guardarPC()">Guardar</button>
-
-<h3>Histórico PCs</h3>
-<div id="listaPC"></div>
-
+<h2>Computadores</h2>
+<p>Em construção</p>
 </div>
 
 <!-- CONFIG -->
 <div id="config" style="display:none">
-<h2>Config</h2>
-<label><input type="checkbox" id="darkSwitch"> Dark Mode</label>
+<h2>Configurações</h2>
+<p>Em breve</p>
 </div>
 
 </div>
 
+<!-- NAV FIXA -->
 <nav>
 <button onclick="mudarPagina('impressoras')">🖨️</button>
 <button onclick="mudarPagina('computadores')">💻</button>
@@ -152,5 +186,6 @@ button{
 </nav>
 
 <script src="app.js"></script>
+
 </body>
 </html>
