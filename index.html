@@ -2,9 +2,9 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-<title>App Toners</title>
+<title>Dashboard Empresa</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -16,11 +16,17 @@ body{
   background:#f2f2f7;
 }
 
-.container{
-  padding:15px;
-  padding-bottom:100px;
+.dark{
+  background:#1c1c1e;
+  color:white;
 }
 
+.container{
+  padding:15px;
+  padding-bottom:120px;
+}
+
+/* DASHBOARD */
 .top{
   display:flex;
   gap:10px;
@@ -28,34 +34,49 @@ body{
 
 .box{
   flex:1;
-  background:#fff;
   padding:15px;
-  border-radius:12px;
+  border-radius:15px;
   text-align:center;
+  background:white;
 }
 
+.dark .box{ background:#2c2c2e; }
+
 .big{
-  font-size:22px;
+  font-size:24px;
   font-weight:bold;
 }
 
 input,select,button{
   width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:10px;
+  padding:14px;
+  margin-top:8px;
+  border-radius:12px;
 }
 
 button{
   background:#007AFF;
   color:white;
-  border:none;
 }
 
 .card{
   background:white;
   padding:12px;
-  border-radius:10px;
+  border-radius:12px;
+  margin-top:10px;
+  transition:0.2s;
+}
+
+.card:active{
+  transform:scale(0.97);
+}
+
+.dark .card{
+  background:#2c2c2e;
+}
+
+.delete{
+  background:red;
   margin-top:10px;
 }
 
@@ -68,6 +89,12 @@ nav{
   background:white;
   padding:10px;
 }
+
+nav button{
+  background:none;
+  border:none;
+  font-size:22px;
+}
 </style>
 </head>
 
@@ -75,6 +102,7 @@ nav{
 
 <div class="container">
 
+<!-- DASHBOARD -->
 <div id="impressoras">
 
 <h2>Dashboard Toners</h2>
@@ -91,7 +119,7 @@ nav{
   </div>
 </div>
 
-<input id="search" placeholder="Pesquisar por localização..." oninput="filtrar()">
+<input id="search" placeholder="Pesquisar ID..." oninput="filtrar()">
 
 <h3>Adicionar</h3>
 
@@ -105,9 +133,20 @@ nav{
 <select id="localizacao">
 <option value="">Localização</option>
 <option>Sem Localização</option>
-<option>Ilha 1</option>
-<option>Ilha 2</option>
-<option>Ilha 3</option>
+<option>Ilha 1 - R4B2229805</option>
+<option>Ilha 2 - WD44336210</option>
+<option>Ilha 3 - R4B1395508</option>
+<option>Ilha 4 - R4B1293179</option>
+<option>Ilha 5 - R4B1293180</option>
+<option>Balcão 1 - R4B1293183</option>
+<option>Balcão 2 - R4B1293184</option>
+<option>Dep.Logistica - R4B2230012</option>
+<option>Grandes.Encomendas - R4B1293173</option>
+<option>Devoluções - R4B1395261</option>
+<option>Escritório - RVP0ZZ03770</option>
+<option>Ilha1-VRL - R4B1293169</option>
+<option>Ilha2-VRL - R4B1293174</option>
+<option>Ilha3-VRL - RVP0Z03715</option>
 </select>
 
 <select id="cor">
@@ -119,7 +158,6 @@ nav{
 </select>
 
 <input type="date" id="data">
-
 <button onclick="disponivel()">Adicionar</button>
 
 <h3>Stock</h3>
@@ -130,21 +168,7 @@ nav{
 
 </div>
 
-<div id="computadores" style="display:none">
-<h2>Computadores</h2>
 </div>
-
-<div id="config" style="display:none">
-<h2>Config</h2>
-</div>
-
-</div>
-
-<nav>
-<button onclick="mudarPagina('impressoras')">🖨️</button>
-<button onclick="mudarPagina('computadores')">💻</button>
-<button onclick="mudarPagina('config')">⚙️</button>
-</nav>
 
 <script src="app.js"></script>
 </body>
