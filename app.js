@@ -9,11 +9,22 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 
-// NAV
+// NAV CORRIGIDA
 window.mudarPagina = function(p){
-  document.getElementById("impressoras").style.display="none";
-  document.getElementById("config").style.display="none";
+
+  ["impressoras","computadores","config"].forEach(id=>{
+    let el = document.getElementById(id);
+    if(el) el.style.display="none";
+  });
+
   document.getElementById(p).style.display="block";
+};
+
+
+// BOTÃO HOJE
+window.hoje = function(){
+  document.getElementById("data").value =
+    new Date().toISOString().split("T")[0];
 };
 
 
@@ -25,7 +36,6 @@ async function gerarID(){
     const doc = await t.get(ref);
 
     let numero = 1;
-
     if(doc.exists){
       numero = doc.data().valor + 1;
     }
@@ -37,7 +47,7 @@ async function gerarID(){
 }
 
 
-// ADICIONAR
+// ADICIONAR TONER
 window.disponivel = async function(){
 
   let eq = document.getElementById("equipamento").value;
@@ -56,25 +66,24 @@ window.disponivel = async function(){
   let idGerado = await gerarID();
 
   await db.collection("stock").add({
-    idInterno: idGerado,
-    equipamento: eq,
-    localizacao: loc,
-    cor: cor,
-    data: data
+    idInterno:idGerado,
+    equipamento:eq,
+    localizacao:loc,
+    cor:cor,
+    data:data
   });
 
-  alert("Criado: " + idGerado);
+  alert("Criado: "+idGerado);
 };
 
 
-// STOCK (COM CHECKBOX)
+// STOCK COM CHECKBOX
 db.collection("stock").onSnapshot(snap=>{
-
-  let lista = document.getElementById("listaStock");
+  let lista=document.getElementById("listaStock");
   lista.innerHTML="";
 
   snap.forEach(doc=>{
-    let t = doc.data();
+    let t=doc.data();
 
     lista.innerHTML+=`
       <div class="card">
@@ -86,30 +95,26 @@ db.collection("stock").onSnapshot(snap=>{
       </div>
     `;
   });
-
 });
 
 
-// 🔥 USAR VIA CHECKBOX
+// USAR TONER
 window.usar = async function(id){
+  let ref=db.collection("stock").doc(id);
+  let snap=await ref.get();
 
-  let ref = db.collection("stock").doc(id);
-  let snap = await ref.get();
-
-  let dados = snap.data();
-
-  await db.collection("historico").add(dados);
+  await db.collection("historico").add(snap.data());
   await ref.delete();
 };
 
 
 // HISTÓRICO
 db.collection("historico").onSnapshot(snap=>{
-  let lista = document.getElementById("listaHistorico");
+  let lista=document.getElementById("listaHistorico");
   lista.innerHTML="";
 
   snap.forEach(doc=>{
-    let t = doc.data();
+    let t=doc.data();
 
     lista.innerHTML+=`
       <div class="card">
@@ -124,15 +129,93 @@ db.collection("historico").onSnapshot(snap=>{
 });
 
 
-// APAGAR
+// APAGAR HISTÓRICO
 window.apagar = async function(id){
   await db.collection("historico").doc(id).delete();
 };
 
 
-// DARK MODE
-window.onload = ()=>{
+// -------- COMPUTADORES --------
 
+const passos=[
+"TEAMVIEWER HOST","TEAMS","DNS",
+"NOME DO SISTEMA","Atribuir Dominio",
+"Desinstalar MCFee","Instalar Sophos",
+"MICROSOFT 365","Instalar Impressora",
+"Alterar Energia","Apagar User","Criar novo user"
+];
+
+function carregarChecklist(){
+  let html="";
+  passos.forEach((p,i)=>{
+    html+=`
+      <div class="card">
+        <input type="checkbox" id="p${i}"> ${p}
+      </div>
+    `;
+  });
+  document.getElementById("checklist").innerHTML=html;
+}
+
+
+// GUARDAR PC
+window.guardarPC = async function(){
+
+  let nome=document.getElementById("nomePC").value;
+
+  if(!nome){
+    alert("Nome obrigatório");
+    return;
+  }
+
+  let dados=[];
+  passos.forEach((p,i)=>{
+    dados.push({
+      passo:p,
+      feito:document.getElementById("p"+i).checked
+    });
+  });
+
+  await db.collection("pcs").add({
+    nome:nome,
+    passos:dados,
+    data:new Date().toLocaleDateString()
+  });
+
+  alert("Guardado!");
+};
+
+
+// HISTÓRICO PCs
+db.collection("pcs").onSnapshot(snap=>{
+  let lista=document.getElementById("listaPC");
+  lista.innerHTML="";
+
+  snap.forEach(doc=>{
+    let d=doc.data();
+
+    let html="";
+    d.passos.forEach(p=>{
+      html+=`<div>${p.feito?"✔":"❌"} ${p.passo}</div>`;
+    });
+
+    lista.innerHTML+=`
+      <div class="card">
+        <b>${d.nome}</b><br>
+        ${html}
+        <button class="delete" onclick="apagarPC('${doc.id}')">❌</button>
+      </div>
+    `;
+  });
+});
+
+window.apagarPC = async function(id){
+  await db.collection("pcs").doc(id).delete();
+};
+
+
+// DARK MODE
+window.onload=()=>{
   let sw=document.getElementById("darkSwitch");
 
   if(localStorage.getItem("modo")==="dark"){
@@ -147,4 +230,5 @@ window.onload = ()=>{
     });
   }
 
+  carregarChecklist();
 };
