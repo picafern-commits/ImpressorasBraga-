@@ -8,20 +8,46 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-let stockGlobal = [];
+
+// NAV
+window.mudarPagina = function(p){
+
+  ["impressoras","computadores","config"].forEach(id=>{
+    let el = document.getElementById(id);
+    if(el) el.style.display="none";
+  });
+
+  document.getElementById(p).style.display="block";
+
+  // 🔥 força checklist aparecer
+  if(p === "computadores"){
+    carregarChecklist();
+  }
+};
 
 
-// GERAR ID
+// HOJE
+window.hoje = function(){
+  document.getElementById("data").value =
+    new Date().toISOString().split("T")[0];
+};
+
+
+// ID GLOBAL
 async function gerarID(){
   const ref = db.collection("config").doc("contador");
 
   return db.runTransaction(async (t)=>{
     const doc = await t.get(ref);
 
-    let numero = doc.exists ? doc.data().valor + 1 : 1;
-    t.set(ref,{valor:numero});
+    let numero = 1;
+    if(doc.exists){
+      numero = doc.data().valor + 1;
+    }
 
-    return "TON-" + String(numero).padStart(4,"0");
+    t.set(ref, { valor: numero });
+
+    return "TON-" + String(numero).padStart(4, '0');
   });
 }
 
@@ -38,50 +64,56 @@ window.disponivel = async function(){
   if(!data) data="Não tem Data";
 
   if(!eq || !cor){
-    alert("Preenche tudo");
+    alert("Preenche equipamento e cor");
     return;
   }
 
-  let id = await gerarID();
+  let idGerado = await gerarID();
 
   await db.collection("stock").add({
-    idInterno:id,
+    idInterno:idGerado,
     equipamento:eq,
     localizacao:loc,
     cor:cor,
-    data:data,
-    created:new Date()
+    data:data
   });
-
 };
 
 
 // STOCK
-db.collection("stock").orderBy("created","desc").onSnapshot(snap=>{
-
-  stockGlobal = [];
-
-  document.getElementById("countStock").innerText = snap.size;
-
-  if(snap.size < 5){
-    document.getElementById("countStock").style.color="red";
-  }
+db.collection("stock").onSnapshot(snap=>{
+  let lista=document.getElementById("listaStock");
+  lista.innerHTML="";
 
   snap.forEach(doc=>{
-    let t = doc.data();
-    t.idDoc = doc.id;
-    stockGlobal.push(t);
-  });
+    let t=doc.data();
 
-  renderStock(stockGlobal);
+    lista.innerHTML+=`
+      <div class="card">
+        <input type="checkbox" onchange="usar('${doc.id}')">
+        <b>${t.idInterno}</b><br>
+        ${t.equipamento} - ${t.cor}<br>
+        ${t.localizacao}<br>
+        ${t.data}
+      </div>
+    `;
+  });
 });
+
+
+// USAR
+window.usar = async function(id){
+  let ref=db.collection("stock").doc(id);
+  let snap=await ref.get();
+
+  await db.collection("historico").add(snap.data());
+  await ref.delete();
+};
 
 
 // HISTÓRICO
 db.collection("historico").onSnapshot(snap=>{
-  document.getElementById("countUsados").innerText = snap.size;
-
-  let lista = document.getElementById("listaHistorico");
+  let lista=document.getElementById("listaHistorico");
   lista.innerHTML="";
 
   snap.forEach(doc=>{
@@ -91,56 +123,117 @@ db.collection("historico").onSnapshot(snap=>{
       <div class="card">
         <b>${t.idInterno}</b><br>
         ${t.equipamento} - ${t.cor}<br>
-        ${t.localizacao}
+        ${t.localizacao}<br>
+        ${t.data}
         <button class="delete" onclick="apagar('${doc.id}')">❌</button>
       </div>
     `;
   });
 });
 
+window.apagar = async function(id){
+  await db.collection("historico").doc(id).delete();
+};
 
-// RENDER STOCK
-function renderStock(lista){
-  let div=document.getElementById("listaStock");
-  div.innerHTML="";
 
-  lista.forEach(t=>{
-    div.innerHTML+=`
-      <div class="card">
-        <input type="checkbox" onchange="usar('${t.idDoc}')">
-        <b>${t.idInterno}</b><br>
-        ${t.equipamento} - ${t.cor}<br>
-        ${t.localizacao}
+// -------- CHECKLIST --------
+
+const passos=[
+"TEAMVIEWER HOST","TEAMS","DNS",
+"NOME DO SISTEMA","Atribuir Dominio",
+"Desinstalar MCFee","Instalar Sophos",
+"MICROSOFT 365","Instalar Impressora",
+"Alterar Energia","Apagar User","Criar novo user"
+];
+
+function carregarChecklist(){
+
+  let el = document.getElementById("checklist");
+  if(!el) return;
+
+  let html="";
+
+  passos.forEach((p,i)=>{
+    html+=`
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>${p}</span>
+        <input type="checkbox" id="p${i}">
       </div>
     `;
   });
+
+  el.innerHTML = html;
 }
 
 
-// FILTRO
-window.filtrar = function(){
-  let txt = document.getElementById("search").value.toLowerCase();
+// GUARDAR PC
+window.guardarPC = async function(){
 
-  let filtrado = stockGlobal.filter(t =>
-    t.idInterno.toLowerCase().includes(txt)
-  );
+  let nome=document.getElementById("nomePC").value;
 
-  renderStock(filtrado);
+  if(!nome){
+    alert("Nome obrigatório");
+    return;
+  }
+
+  let dados=[];
+  passos.forEach((p,i)=>{
+    dados.push({
+      passo:p,
+      feito:document.getElementById("p"+i).checked
+    });
+  });
+
+  await db.collection("pcs").add({
+    nome:nome,
+    passos:dados
+  });
 };
 
 
-// USAR
-window.usar = async function(id){
+// HISTÓRICO PCs
+db.collection("pcs").onSnapshot(snap=>{
+  let lista=document.getElementById("listaPC");
+  lista.innerHTML="";
 
-  let ref = db.collection("stock").doc(id);
-  let snap = await ref.get();
+  snap.forEach(doc=>{
+    let d=doc.data();
 
-  await db.collection("historico").add(snap.data());
-  await ref.delete();
+    let html="";
+    d.passos.forEach(p=>{
+      html+=`<div>${p.feito?"✔":"❌"} ${p.passo}</div>`;
+    });
+
+    lista.innerHTML+=`
+      <div class="card">
+        <b>${d.nome}</b><br>
+        ${html}
+        <button class="delete" onclick="apagarPC('${doc.id}')">❌</button>
+      </div>
+    `;
+  });
+});
+
+window.apagarPC = async function(id){
+  await db.collection("pcs").doc(id).delete();
 };
 
 
-// APAGAR
-window.apagar = async function(id){
-  await db.collection("historico").doc(id).delete();
+// DARK MODE
+window.onload=()=>{
+  let sw=document.getElementById("darkSwitch");
+
+  if(localStorage.getItem("modo")==="dark"){
+    document.body.classList.add("dark");
+    if(sw) sw.checked=true;
+  }
+
+  if(sw){
+    sw.addEventListener("change",function(){
+      document.body.classList.toggle("dark",this.checked);
+      localStorage.setItem("modo",this.checked?"dark":"light");
+    });
+  }
+
+  carregarChecklist();
 };
