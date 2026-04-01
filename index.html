@@ -2,9 +2,9 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>App Empresa</title>
+<title>App Toners</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -14,20 +14,13 @@ body{
   margin:0;
   font-family:-apple-system;
   background:#f2f2f7;
-  overflow-x:hidden;
-}
-
-.dark{
-  background:#1c1c1e;
-  color:white;
 }
 
 .container{
   padding:15px;
-  padding-bottom:120px;
+  padding-bottom:100px;
 }
 
-/* DASHBOARD */
 .top{
   display:flex;
   gap:10px;
@@ -35,44 +28,34 @@ body{
 
 .box{
   flex:1;
+  background:#fff;
   padding:15px;
-  border-radius:15px;
+  border-radius:12px;
   text-align:center;
-  background:white;
 }
 
-.dark .box{ background:#2c2c2e; }
-
 .big{
-  font-size:24px;
+  font-size:22px;
   font-weight:bold;
 }
 
 input,select,button{
   width:100%;
-  padding:14px;
-  margin-top:8px;
-  border-radius:12px;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
 }
 
 button{
   background:#007AFF;
   color:white;
+  border:none;
 }
 
 .card{
   background:white;
   padding:12px;
-  border-radius:12px;
-  margin-top:10px;
-}
-
-.dark .card{
-  background:#2c2c2e;
-}
-
-.delete{
-  background:red;
+  border-radius:10px;
   margin-top:10px;
 }
 
@@ -85,12 +68,6 @@ nav{
   background:white;
   padding:10px;
 }
-
-nav button{
-  background:none;
-  border:none;
-  font-size:22px;
-}
 </style>
 </head>
 
@@ -98,7 +75,6 @@ nav button{
 
 <div class="container">
 
-<!-- IMPRESSORAS -->
 <div id="impressoras">
 
 <h2>Dashboard Toners</h2>
@@ -129,4 +105,47 @@ nav button{
 <select id="localizacao">
 <option value="">Localização</option>
 <option>Sem Localização</option>
-<option>Ilha 1 - R4B2229805</option
+<option>Ilha 1</option>
+<option>Ilha 2</option>
+<option>Ilha 3</option>
+</select>
+
+<select id="cor">
+<option value="">Cor</option>
+<option>Preto</option>
+<option>Amarelo</option>
+<option>Vermelho</option>
+<option>Azul</option>
+</select>
+
+<input type="date" id="data">
+
+<button onclick="disponivel()">Adicionar</button>
+
+<h3>Stock</h3>
+<div id="listaStock"></div>
+
+<h3>Histórico</h3>
+<div id="listaHistorico"></div>
+
+</div>
+
+<div id="computadores" style="display:none">
+<h2>Computadores</h2>
+</div>
+
+<div id="config" style="display:none">
+<h2>Config</h2>
+</div>
+
+</div>
+
+<nav>
+<button onclick="mudarPagina('impressoras')">🖨️</button>
+<button onclick="mudarPagina('computadores')">💻</button>
+<button onclick="mudarPagina('config')">⚙️</button>
+</nav>
+
+<script src="app.js"></script>
+</body>
+</html>
