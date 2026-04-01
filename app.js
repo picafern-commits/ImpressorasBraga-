@@ -7,27 +7,29 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-let stockGlobal = [];
+let stockGlobal=[];
 
 
 // NAV
 function mudarPagina(p){
-  ["impressoras","config"].forEach(id=>{
+  ["impressoras","computadores","config"].forEach(id=>{
     document.getElementById(id).style.display="none";
   });
   document.getElementById(p).style.display="block";
+
+  if(p==="computadores") carregarChecklist();
 }
 
 
 // ID
 async function gerarID(){
-  const ref = db.collection("config").doc("contador");
+  const ref=db.collection("config").doc("contador");
 
-  return db.runTransaction(async (t)=>{
-    const doc = await t.get(ref);
-    let numero = doc.exists ? doc.data().valor + 1 : 1;
-    t.set(ref,{valor:numero});
-    return "TON-" + String(numero).padStart(4,"0");
+  return db.runTransaction(async t=>{
+    let doc=await t.get(ref);
+    let n=doc.exists?doc.data().valor+1:1;
+    t.set(ref,{valor:n});
+    return "TON-"+String(n).padStart(4,"0");
   });
 }
 
@@ -35,52 +37,40 @@ async function gerarID(){
 // ADD
 async function disponivel(){
 
-  let eq = equipamento.value;
-  let loc = localizacao.value;
-  let cor = document.getElementById("cor").value;
-  let data = document.getElementById("data").value;
+  let eq=equipamento.value;
+  let loc=localizacao.value;
+  let cor=document.getElementById("cor").value;
+  let data=document.getElementById("data").value;
 
-  if(!eq || !cor){
+  if(!eq||!cor){
     alert("Preenche tudo");
     return;
   }
 
-  let id = await gerarID();
+  let id=await gerarID();
 
   await db.collection("stock").add({
     idInterno:id,
     equipamento:eq,
-    localizacao:loc || "Sem Localização",
+    localizacao:loc||"Sem Localização",
     cor:cor,
-    data:data || "Sem Data",
+    data:data||"Sem Data",
     created:new Date()
   });
-
-  // limpar campos
-  equipamento.value="";
-  localizacao.value="";
-  cor.value="";
-  data.value="";
 }
 
 
 // STOCK
 db.collection("stock").orderBy("created","desc").onSnapshot(snap=>{
+  stockGlobal=[];
+  countStock.innerText=snap.size;
 
-  stockGlobal = [];
-
-  let count = snap.size;
-  let el = document.getElementById("countStock");
-
-  el.innerText = count;
-  el.style.color = count < 5 ? "red" : "green";
-
-  let lista = document.getElementById("listaStock");
+  let lista=listaStock;
   lista.innerHTML="";
 
   snap.forEach(doc=>{
-    let t = doc.data();
-    t.idDoc = doc.id;
+    let t=doc.data();
+    t.idDoc=doc.id;
     stockGlobal.push(t);
 
     lista.innerHTML+=`
@@ -97,10 +87,9 @@ db.collection("stock").orderBy("created","desc").onSnapshot(snap=>{
 
 // HISTÓRICO
 db.collection("historico").onSnapshot(snap=>{
+  countUsados.innerText=snap.size;
 
-  document.getElementById("countUsados").innerText = snap.size;
-
-  let lista = document.getElementById("listaHistorico");
+  let lista=listaHistorico;
   lista.innerHTML="";
 
   snap.forEach(doc=>{
@@ -109,8 +98,7 @@ db.collection("historico").onSnapshot(snap=>{
     lista.innerHTML+=`
       <div class="card">
         <b>${t.idInterno}</b><br>
-        ${t.equipamento} - ${t.cor}<br>
-        ${t.localizacao}
+        ${t.equipamento}
         <button class="delete" onclick="apagar('${doc.id}')">❌</button>
       </div>
     `;
@@ -120,47 +108,105 @@ db.collection("historico").onSnapshot(snap=>{
 
 // USAR
 async function usar(id){
-
   if(!confirm("Marcar como usado?")) return;
 
-  let ref = db.collection("stock").doc(id);
-  let snap = await ref.get();
+  let ref=db.collection("stock").doc(id);
+  let snap=await ref.get();
 
   await db.collection("historico").add(snap.data());
   await ref.delete();
 }
 
 
-// APAGAR
-async function apagar(id){
-  await db.collection("historico").doc(id).delete();
-}
-
-
-// FILTRO INTELIGENTE
+// FILTRO
 function filtrar(){
+  let txt=search.value.toLowerCase();
 
-  let txt = document.getElementById("search").value.toLowerCase();
-
-  let lista = document.getElementById("listaStock");
+  let lista=listaStock;
   lista.innerHTML="";
 
-  stockGlobal
-    .filter(t =>
-      (t.localizacao || "").toLowerCase().includes(txt) ||
-      (t.equipamento || "").toLowerCase().includes(txt) ||
-      (t.cor || "").toLowerCase().includes(txt)
-    )
-    .forEach(t=>{
-      lista.innerHTML+=`
-        <div class="card">
-          <b>${t.idInterno}</b><br>
-          ${t.equipamento} - ${t.cor}<br>
-          ${t.localizacao}
-        </div>
-      `;
-    });
+  stockGlobal.filter(t=>
+    (t.localizacao||"").toLowerCase().includes(txt)
+  ).forEach(t=>{
+    lista.innerHTML+=`
+      <div class="card">
+        <b>${t.idInterno}</b><br>
+        ${t.equipamento} - ${t.cor}<br>
+        ${t.localizacao}
+      </div>
+    `;
+  });
 }
+
+
+// CHECKLIST
+const passos=[
+"TEAMVIEWER HOST","TEAMS","DNS",
+"NOME DO SISTEMA","Atribuir Dominio",
+"Desinstalar MCFee","Instalar Sophos",
+"MICROSOFT 365","Instalar Impressora",
+"Alterar Energia","Apagar User","Criar novo user"
+];
+
+function carregarChecklist(){
+  let el=document.getElementById("checklist");
+  if(!el) return;
+
+  let html="";
+  passos.forEach((p,i)=>{
+    html+=`
+      <div class="card">
+        ${p}
+        <input type="checkbox" id="p${i}">
+      </div>
+    `;
+  });
+
+  el.innerHTML=html;
+}
+
+
+// GUARDAR PC
+async function guardarPC(){
+
+  let nome=nomePC.value;
+  if(!nome){ alert("Nome obrigatório"); return; }
+
+  let dados=[];
+  passos.forEach((p,i)=>{
+    dados.push({
+      passo:p,
+      feito:document.getElementById("p"+i).checked
+    });
+  });
+
+  await db.collection("pcs").add({
+    nome:nome,
+    passos:dados
+  });
+}
+
+
+// HISTÓRICO PCs
+db.collection("pcs").onSnapshot(snap=>{
+  let lista=listaPC;
+  lista.innerHTML="";
+
+  snap.forEach(doc=>{
+    let d=doc.data();
+
+    let html="";
+    d.passos.forEach(p=>{
+      html+=`<div>${p.feito?"✔":"❌"} ${p.passo}</div>`;
+    });
+
+    lista.innerHTML+=`
+      <div class="card">
+        <b>${d.nome}</b><br>${html}
+      </div>
+    `;
+  });
+});
 
 
 // DARK MODE
@@ -172,8 +218,8 @@ window.onload=()=>{
     sw.checked=true;
   }
 
-  sw.addEventListener("change",function(){
-    document.body.classList.toggle("dark",this.checked);
-    localStorage.setItem("modo",this.checked?"dark":"light");
+  sw.addEventListener("change",()=>{
+    document.body.classList.toggle("dark");
+    localStorage.setItem("modo",sw.checked?"dark":"light");
   });
 };
