@@ -11,6 +11,16 @@ const db = firebase.firestore();
 let stockGlobal = [];
 
 
+// NAV
+window.mudarPagina = function(p){
+  ["impressoras","computadores","config"].forEach(id=>{
+    let el = document.getElementById(id);
+    if(el) el.style.display="none";
+  });
+  document.getElementById(p).style.display="block";
+};
+
+
 // GERAR ID
 async function gerarID(){
   const ref = db.collection("config").doc("contador");
@@ -65,6 +75,8 @@ db.collection("stock").orderBy("created","desc").onSnapshot(snap=>{
 
   if(snap.size < 5){
     document.getElementById("countStock").style.color="red";
+  } else {
+    document.getElementById("countStock").style.color="black";
   }
 
   snap.forEach(doc=>{
@@ -79,6 +91,7 @@ db.collection("stock").orderBy("created","desc").onSnapshot(snap=>{
 
 // HISTÓRICO
 db.collection("historico").onSnapshot(snap=>{
+
   document.getElementById("countUsados").innerText = snap.size;
 
   let lista = document.getElementById("listaHistorico");
@@ -91,7 +104,8 @@ db.collection("historico").onSnapshot(snap=>{
       <div class="card">
         <b>${t.idInterno}</b><br>
         ${t.equipamento} - ${t.cor}<br>
-        ${t.localizacao}
+        ${t.localizacao}<br>
+        ${t.data}
         <button class="delete" onclick="apagar('${doc.id}')">❌</button>
       </div>
     `;
@@ -110,19 +124,21 @@ function renderStock(lista){
         <input type="checkbox" onchange="usar('${t.idDoc}')">
         <b>${t.idInterno}</b><br>
         ${t.equipamento} - ${t.cor}<br>
-        ${t.localizacao}
+        ${t.localizacao}<br>
+        ${t.data}
       </div>
     `;
   });
 }
 
 
-// FILTRO
+// FILTRO POR LOCALIZAÇÃO
 window.filtrar = function(){
+
   let txt = document.getElementById("search").value.toLowerCase();
 
   let filtrado = stockGlobal.filter(t =>
-    t.idInterno.toLowerCase().includes(txt)
+    (t.localizacao || "").toLowerCase().includes(txt)
   );
 
   renderStock(filtrado);
@@ -131,7 +147,6 @@ window.filtrar = function(){
 
 // USAR
 window.usar = async function(id){
-
   let ref = db.collection("stock").doc(id);
   let snap = await ref.get();
 
@@ -140,7 +155,23 @@ window.usar = async function(id){
 };
 
 
-// APAGAR
+// APAGAR HISTÓRICO
 window.apagar = async function(id){
   await db.collection("historico").doc(id).delete();
+};
+
+
+// DARK MODE
+window.onload=()=>{
+  let sw=document.getElementById("darkSwitch");
+
+  if(localStorage.getItem("modo")==="dark"){
+    document.body.classList.add("dark");
+    sw.checked=true;
+  }
+
+  sw.addEventListener("change",function(){
+    document.body.classList.toggle("dark",this.checked);
+    localStorage.setItem("modo",this.checked?"dark":"light");
+  });
 };
