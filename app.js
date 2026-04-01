@@ -8,46 +8,20 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-
-// NAV
-window.mudarPagina = function(p){
-
-  ["impressoras","computadores","config"].forEach(id=>{
-    let el = document.getElementById(id);
-    if(el) el.style.display="none";
-  });
-
-  document.getElementById(p).style.display="block";
-
-  // 🔥 força checklist aparecer
-  if(p === "computadores"){
-    carregarChecklist();
-  }
-};
+let stockGlobal = [];
 
 
-// HOJE
-window.hoje = function(){
-  document.getElementById("data").value =
-    new Date().toISOString().split("T")[0];
-};
-
-
-// ID GLOBAL
+// GERAR ID
 async function gerarID(){
   const ref = db.collection("config").doc("contador");
 
   return db.runTransaction(async (t)=>{
     const doc = await t.get(ref);
 
-    let numero = 1;
-    if(doc.exists){
-      numero = doc.data().valor + 1;
-    }
+    let numero = doc.exists ? doc.data().valor + 1 : 1;
+    t.set(ref,{valor:numero});
 
-    t.set(ref, { valor: numero });
-
-    return "TON-" + String(numero).padStart(4, '0');
+    return "TON-" + String(numero).padStart(4,"0");
   });
 }
 
@@ -64,56 +38,50 @@ window.disponivel = async function(){
   if(!data) data="Não tem Data";
 
   if(!eq || !cor){
-    alert("Preenche equipamento e cor");
+    alert("Preenche tudo");
     return;
   }
 
-  let idGerado = await gerarID();
+  let id = await gerarID();
 
   await db.collection("stock").add({
-    idInterno:idGerado,
+    idInterno:id,
     equipamento:eq,
     localizacao:loc,
     cor:cor,
-    data:data
+    data:data,
+    created:new Date()
   });
+
 };
 
 
 // STOCK
-db.collection("stock").onSnapshot(snap=>{
-  let lista=document.getElementById("listaStock");
-  lista.innerHTML="";
+db.collection("stock").orderBy("created","desc").onSnapshot(snap=>{
+
+  stockGlobal = [];
+
+  document.getElementById("countStock").innerText = snap.size;
+
+  if(snap.size < 5){
+    document.getElementById("countStock").style.color="red";
+  }
 
   snap.forEach(doc=>{
-    let t=doc.data();
-
-    lista.innerHTML+=`
-      <div class="card">
-        <input type="checkbox" onchange="usar('${doc.id}')">
-        <b>${t.idInterno}</b><br>
-        ${t.equipamento} - ${t.cor}<br>
-        ${t.localizacao}<br>
-        ${t.data}
-      </div>
-    `;
+    let t = doc.data();
+    t.idDoc = doc.id;
+    stockGlobal.push(t);
   });
+
+  renderStock(stockGlobal);
 });
-
-
-// USAR
-window.usar = async function(id){
-  let ref=db.collection("stock").doc(id);
-  let snap=await ref.get();
-
-  await db.collection("historico").add(snap.data());
-  await ref.delete();
-};
 
 
 // HISTÓRICO
 db.collection("historico").onSnapshot(snap=>{
-  let lista=document.getElementById("listaHistorico");
+  document.getElementById("countUsados").innerText = snap.size;
+
+  let lista = document.getElementById("listaHistorico");
   lista.innerHTML="";
 
   snap.forEach(doc=>{
@@ -123,117 +91,56 @@ db.collection("historico").onSnapshot(snap=>{
       <div class="card">
         <b>${t.idInterno}</b><br>
         ${t.equipamento} - ${t.cor}<br>
-        ${t.localizacao}<br>
-        ${t.data}
+        ${t.localizacao}
         <button class="delete" onclick="apagar('${doc.id}')">❌</button>
       </div>
     `;
   });
 });
 
-window.apagar = async function(id){
-  await db.collection("historico").doc(id).delete();
-};
 
+// RENDER STOCK
+function renderStock(lista){
+  let div=document.getElementById("listaStock");
+  div.innerHTML="";
 
-// -------- CHECKLIST --------
-
-const passos=[
-"TEAMVIEWER HOST","TEAMS","DNS",
-"NOME DO SISTEMA","Atribuir Dominio",
-"Desinstalar MCFee","Instalar Sophos",
-"MICROSOFT 365","Instalar Impressora",
-"Alterar Energia","Apagar User","Criar novo user"
-];
-
-function carregarChecklist(){
-
-  let el = document.getElementById("checklist");
-  if(!el) return;
-
-  let html="";
-
-  passos.forEach((p,i)=>{
-    html+=`
-      <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
-        <span>${p}</span>
-        <input type="checkbox" id="p${i}">
+  lista.forEach(t=>{
+    div.innerHTML+=`
+      <div class="card">
+        <input type="checkbox" onchange="usar('${t.idDoc}')">
+        <b>${t.idInterno}</b><br>
+        ${t.equipamento} - ${t.cor}<br>
+        ${t.localizacao}
       </div>
     `;
   });
-
-  el.innerHTML = html;
 }
 
 
-// GUARDAR PC
-window.guardarPC = async function(){
+// FILTRO
+window.filtrar = function(){
+  let txt = document.getElementById("search").value.toLowerCase();
 
-  let nome=document.getElementById("nomePC").value;
+  let filtrado = stockGlobal.filter(t =>
+    t.idInterno.toLowerCase().includes(txt)
+  );
 
-  if(!nome){
-    alert("Nome obrigatório");
-    return;
-  }
-
-  let dados=[];
-  passos.forEach((p,i)=>{
-    dados.push({
-      passo:p,
-      feito:document.getElementById("p"+i).checked
-    });
-  });
-
-  await db.collection("pcs").add({
-    nome:nome,
-    passos:dados
-  });
+  renderStock(filtrado);
 };
 
 
-// HISTÓRICO PCs
-db.collection("pcs").onSnapshot(snap=>{
-  let lista=document.getElementById("listaPC");
-  lista.innerHTML="";
+// USAR
+window.usar = async function(id){
 
-  snap.forEach(doc=>{
-    let d=doc.data();
+  let ref = db.collection("stock").doc(id);
+  let snap = await ref.get();
 
-    let html="";
-    d.passos.forEach(p=>{
-      html+=`<div>${p.feito?"✔":"❌"} ${p.passo}</div>`;
-    });
-
-    lista.innerHTML+=`
-      <div class="card">
-        <b>${d.nome}</b><br>
-        ${html}
-        <button class="delete" onclick="apagarPC('${doc.id}')">❌</button>
-      </div>
-    `;
-  });
-});
-
-window.apagarPC = async function(id){
-  await db.collection("pcs").doc(id).delete();
+  await db.collection("historico").add(snap.data());
+  await ref.delete();
 };
 
 
-// DARK MODE
-window.onload=()=>{
-  let sw=document.getElementById("darkSwitch");
-
-  if(localStorage.getItem("modo")==="dark"){
-    document.body.classList.add("dark");
-    if(sw) sw.checked=true;
-  }
-
-  if(sw){
-    sw.addEventListener("change",function(){
-      document.body.classList.toggle("dark",this.checked);
-      localStorage.setItem("modo",this.checked?"dark":"light");
-    });
-  }
-
-  carregarChecklist();
+// APAGAR
+window.apagar = async function(id){
+  await db.collection("historico").doc(id).delete();
 };
