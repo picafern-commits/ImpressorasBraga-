@@ -34,7 +34,7 @@ async function gerarID(){
 }
 
 
-// ADD
+// ADICIONAR TONER
 async function disponivel(){
 
   let eq=equipamento.value;
@@ -85,7 +85,7 @@ db.collection("stock").orderBy("created","desc").onSnapshot(snap=>{
 });
 
 
-// HISTÓRICO
+// HISTÓRICO TONER
 db.collection("historico").onSnapshot(snap=>{
   countUsados.innerText=snap.size;
 
@@ -106,7 +106,7 @@ db.collection("historico").onSnapshot(snap=>{
 });
 
 
-// USAR
+// USAR TONER
 async function usar(id){
   if(!confirm("Marcar como usado?")) return;
 
@@ -139,7 +139,7 @@ function filtrar(){
 }
 
 
-// CHECKLIST
+// CHECKLIST COMPUTADORES
 const passos=[
 "TEAMVIEWER HOST","TEAMS","DNS",
 "NOME DO SISTEMA","Atribuir Dominio",
@@ -150,15 +150,14 @@ const passos=[
 
 function carregarChecklist(){
   let el=document.getElementById("checklist");
-  if(!el) return;
 
   let html="";
   passos.forEach((p,i)=>{
     html+=`
-      <div class="card">
-        ${p}
+      <label class="checkItem">
         <input type="checkbox" id="p${i}">
-      </div>
+        <span>${p}</span>
+      </label>
     `;
   });
 
@@ -184,6 +183,9 @@ async function guardarPC(){
     nome:nome,
     passos:dados
   });
+
+  nomePC.value="";
+  carregarChecklist();
 }
 
 
