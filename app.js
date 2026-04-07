@@ -1,246 +1,232 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyCSgw4rhBLW5mq4QClulubf6e0hf5lDJbo",
-  authDomain: "toner-manager-756c4.firebaseapp.com",
-  projectId: "toner-manager-756c4"
-};
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>App Braga</title>
+  <meta name="theme-color" content="#111827">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
 
-let stockGlobal=[];
+  <div class="app-shell">
+    <header class="mobile-header">
+      <h1>App Braga</h1>
+    </header>
 
+    <main class="mobile-main">
 
-// NAV
-function mudarPagina(p){
-  ["impressoras","computadores","config"].forEach(id=>{
-    document.getElementById(id).style.display="none";
-  });
-  document.getElementById(p).style.display="block";
+      <!-- TONERS -->
+      <section id="impressoras" class="mobile-page">
+        <div class="page-title">
+          <h2>Dashboard Toners</h2>
+          <p>Gestão rápida de stock</p>
+        </div>
 
-  if(p==="computadores") carregarChecklist();
-}
+        <div class="stats-grid mobile-stats">
+          <div class="stat-card">
+            <span>Stock</span>
+            <strong id="countStock">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Usados</span>
+            <strong id="countUsados">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>PCs</span>
+            <strong id="countPCs">0</strong>
+          </div>
+        </div>
 
+        <div class="panel">
+          <input id="searchDashboard" type="text" placeholder="Pesquisar no stock..." oninput="filtrarDashboard()">
+          <div id="listaDashboardStock" class="cards-list"></div>
+        </div>
 
-// ID
-async function gerarID(){
-  const ref=db.collection("config").doc("contador");
+        <div class="panel">
+          <h3>Adicionar Toner</h3>
 
-  return db.runTransaction(async t=>{
-    let doc=await t.get(ref);
-    let n=doc.exists?doc.data().valor+1:1;
-    t.set(ref,{valor:n});
-    return "TON-"+String(n).padStart(4,"0");
-  });
-}
+          <select id="equipamento">
+            <option value="">Equipamento</option>
+            <option>P3155DN</option>
+            <option>TASKalfa_255ci</option>
+            <option>PA5500x</option>
+          </select>
 
+          <select id="localizacao">
+            <option value="">Localização</option>
+            <option>Sem Localização</option>
+            <option>Ilha 1 - R4B2229805</option>
+            <option>Ilha 2 - WD44336210</option>
+            <option>Ilha 3 - R4B1395508</option>
+            <option>Ilha 4 - R4B1293179</option>
+            <option>Ilha 5 - R4B1293180</option>
+            <option>Balcão 1 - R4B1293183</option>
+            <option>Balcão 2 - R4B1293184</option>
+            <option>Dep.Logistica - R4B2230012</option>
+            <option>G/Encomendas - R4B1293173</option>
+            <option>Devoluções - R4B1395261</option>
+            <option>Escritorio - RVP0Z03770</option>
+            <option>Ilha1-VRL - R4B1293169</option>
+            <option>Ilha2-VRL - R4B1293174</option>
+            <option>Ilha3-VRL - RVP0Z03715</option>
+          </select>
 
-// ADD TONER
-async function disponivel(){
+          <select id="cor">
+            <option value="">Cor</option>
+            <option>Preto</option>
+            <option>Amarelo</option>
+            <option>Vermelho</option>
+            <option>Azul</option>
+          </select>
 
-  let eq=equipamento.value;
-  let loc=localizacao.value;
-  let cor=document.getElementById("cor").value;
-  let data=document.getElementById("data").value;
+          <input type="date" id="data">
 
-  if(!eq||!cor){
-    alert("Preenche tudo");
-    return;
-  }
+          <button class="primary-btn" onclick="disponivel()">Adicionar Toner</button>
+        </div>
+      </section>
 
-  let id=await gerarID();
+      <!-- STOCK -->
+      <section id="stockPage" class="mobile-page" style="display:none;">
+        <div class="page-title">
+          <h2>Stock</h2>
+          <p>Toners disponíveis</p>
+        </div>
 
-  await db.collection("stock").add({
-    idInterno:id,
-    equipamento:eq,
-    localizacao:loc||"Sem Localização",
-    cor:cor,
-    data:data||"Sem Data",
-    created:new Date()
-  });
-}
+        <div class="panel">
+          <input id="search" type="text" placeholder="Pesquisar por localização..." oninput="filtrar()">
+        </div>
 
+        <div id="listaStock" class="cards-list"></div>
+      </section>
 
-// STOCK
-db.collection("stock").orderBy("created","desc").onSnapshot(snap=>{
-  stockGlobal=[];
-  countStock.innerText=snap.size;
+      <!-- HISTÓRICO -->
+      <section id="historicoPage" class="mobile-page" style="display:none;">
+        <div class="page-title">
+          <h2>Histórico</h2>
+          <p>Toners usados</p>
+        </div>
 
-  let lista=listaStock;
-  lista.innerHTML="";
+        <div id="listaHistorico" class="cards-list"></div>
+      </section>
 
-  snap.forEach(doc=>{
-    let t=doc.data();
-    t.idDoc=doc.id;
-    stockGlobal.push(t);
+      <!-- COMPUTADORES -->
+      <section id="computadores" class="mobile-page" style="display:none;">
+        <div class="page-title">
+          <h2>Computadores</h2>
+          <p>Checklist de instalação</p>
+        </div>
 
-    lista.innerHTML+=`
-      <div class="card">
-        <input type="checkbox" onchange="usar('${doc.id}')">
-        <b>${t.idInterno}</b><br>
-        ${t.equipamento} - ${t.cor}<br>
-        ${t.localizacao}
-      </div>
-    `;
-  });
-});
+        <div class="panel">
+          <input id="nomePC" type="text" placeholder="Nome do Computador">
+          <input type="date" id="dataPC">
 
+          <div id="checklist" class="checklist-grid mobile-checklist"></div>
 
-// HISTÓRICO TONER
-db.collection("historico").onSnapshot(snap=>{
-  countUsados.innerText=snap.size;
+          <button class="primary-btn" onclick="guardarPC()">Guardar</button>
+        </div>
 
-  let lista=listaHistorico;
-  lista.innerHTML="";
+        <div class="panel">
+          <h3>Histórico de Computadores</h3>
+          <div id="listaPC" class="cards-list"></div>
+        </div>
+      </section>
 
-  snap.forEach(doc=>{
-    let t=doc.data();
+      <!-- IMPRESSORAS -->
+      <section id="impressorasLista" class="mobile-page" style="display:none;">
+        <div class="page-title">
+          <h2>Impressoras</h2>
+          <p>Lista de impressoras e IPs</p>
+        </div>
 
-    lista.innerHTML+=`
-      <div class="card">
-        <b>${t.idInterno}</b><br>
-        ${t.equipamento}
-        <button class="delete" onclick="apagar('${doc.id}')">❌</button>
-      </div>
-    `;
-  });
-});
+        <div class="panel table-panel">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Modelo</th>
+                  <th>Série</th>
+                  <th>Armazém</th>
+                  <th>Localização</th>
+                  <th>IP</th>
+                </tr>
+              </thead>
+              <tbody id="impressorasTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
+      <!-- MANUTENÇÃO IMPRESSORAS -->
+      <section id="manutencaoImpressoras" class="mobile-page" style="display:none;">
+        <div class="page-title">
+          <h2>Manutenção Impressoras</h2>
+          <p>Pedidos e resolução</p>
+        </div>
 
-// USAR TONER
-async function usar(id){
-  if(!confirm("Marcar como usado?")) return;
+        <div class="panel">
+          <select id="manutencaoTecnico">
+            <option value="">Selecionar técnico</option>
+            <option value="Ricardo">Ricardo</option>
+          </select>
 
-  let ref=db.collection("stock").doc(id);
-  let snap=await ref.get();
+          <select id="manutencaoArmazem">
+            <option value="">Selecionar armazém</option>
+            <option value="Braga">Braga</option>
+            <option value="Vila Real">Vila Real</option>
+          </select>
 
-  await db.collection("historico").add(snap.data());
-  await ref.delete();
-}
+          <select id="manutencaoLocalizacao"></select>
+          <select id="manutencaoIP"></select>
 
+          <input type="date" id="manutencaoPedido">
+          <input type="date" id="manutencaoResolucao">
 
-// APAGAR TONER
-async function apagar(id){
-  await db.collection("historico").doc(id).delete();
-}
+          <textarea id="manutencaoMotivo" placeholder="Motivo da manutenção"></textarea>
 
+          <button class="primary-btn" onclick="guardarManutencao()">Guardar manutenção</button>
+        </div>
 
-// FILTRO
-function filtrar(){
-  let txt=search.value.toLowerCase();
+        <div class="panel">
+          <h3>Histórico</h3>
+          <div id="listaManutencoes" class="cards-list"></div>
+        </div>
+      </section>
 
-  let lista=listaStock;
-  lista.innerHTML="";
+      <!-- CONFIG -->
+      <section id="config" class="mobile-page" style="display:none;">
+        <div class="page-title">
+          <h2>Configurações</h2>
+          <p>Preferências da aplicação</p>
+        </div>
 
-  stockGlobal.filter(t=>
-    (t.localizacao||"").toLowerCase().includes(txt)
-  ).forEach(t=>{
-    lista.innerHTML+=`
-      <div class="card">
-        <b>${t.idInterno}</b><br>
-        ${t.equipamento} - ${t.cor}<br>
-        ${t.localizacao}
-      </div>
-    `;
-  });
-}
+        <div class="panel">
+          <label class="switch-row">
+            <input type="checkbox" id="darkSwitch">
+            <span>Dark Mode</span>
+          </label>
+        </div>
+      </section>
 
+    </main>
 
-// CHECKLIST
-const passos=[
-"TEAMVIEWER HOST","TEAMS","DNS",
-"NOME DO SISTEMA","Atribuir Dominio",
-"Desinstalar MCFee","Instalar Sophos",
-"MICROSOFT 365","Instalar Impressora",
-"Alterar Energia","Apagar User","Criar novo user"
-];
+    <nav class="bottom-nav">
+      <button onclick="mudarPagina('impressoras')">🏠</button>
+      <button onclick="mudarPagina('stockPage')">📦</button>
+      <button onclick="mudarPagina('historicoPage')">🕘</button>
+      <button onclick="mudarPagina('computadores')">💻</button>
+      <button onclick="mudarPagina('impressorasLista')">🖨️</button>
+      <button onclick="mudarPagina('manutencaoImpressoras')">🛠️</button>
+      <button onclick="mudarPagina('config')">⚙️</button>
+    </nav>
+  </div>
 
-function carregarChecklist(){
-  let el=document.getElementById("checklist");
-  let html="";
-  passos.forEach((p,i)=>{
-    html+=`
-      <label class="checkItem">
-        <input type="checkbox" id="p${i}">
-        <span>${p}</span>
-      </label>
-    `;
-  });
-  el.innerHTML=html;
-}
-
-
-// GUARDAR PC
-async function guardarPC(){
-
-  let nome=nomePC.value;
-  let data=document.getElementById("dataPC").value;
-
-  if(!nome){ alert("Nome obrigatório"); return; }
-  if(!data) data="Sem Data";
-
-  let dados=[];
-  passos.forEach((p,i)=>{
-    dados.push({
-      passo:p,
-      feito:document.getElementById("p"+i).checked
-    });
-  });
-
-  await db.collection("pcs").add({
-    nome:nome,
-    data:data,
-    passos:dados
-  });
-
-  nomePC.value="";
-  dataPC.value="";
-  carregarChecklist();
-}
-
-
-// HISTÓRICO PCs
-db.collection("pcs").onSnapshot(snap=>{
-  let lista=listaPC;
-  lista.innerHTML="";
-
-  snap.forEach(doc=>{
-    let d=doc.data();
-
-    let html="";
-    d.passos.forEach(p=>{
-      html+=`<div>${p.feito?"✔":"❌"} ${p.passo}</div>`;
-    });
-
-    lista.innerHTML+=`
-      <div class="card">
-        <b>${d.nome}</b><br>
-        📅 ${d.data}<br>
-        ${html}
-        <button class="delete" onclick="apagarPC('${doc.id}')">❌</button>
-      </div>
-    `;
-  });
-});
-
-
-// APAGAR PC
-async function apagarPC(id){
-  if(!confirm("Apagar registo?")) return;
-  await db.collection("pcs").doc(id).delete();
-}
-
-
-// DARK MODE
-window.onload=()=>{
-  let sw=document.getElementById("darkSwitch");
-
-  if(localStorage.getItem("modo")==="dark"){
-    document.body.classList.add("dark");
-    sw.checked=true;
-  }
-
-  sw.addEventListener("change",()=>{
-    document.body.classList.toggle("dark");
-    localStorage.setItem("modo",sw.checked?"dark":"light");
-  });
-};
+  <script src="app.js"></script>
+</body>
+</html>
