@@ -275,7 +275,6 @@ function renderStock() {
       <div class="meta-line">Cor: <span class="meta-value">${t.cor}</span></div>
       <div class="meta-line">Localização: <span class="meta-value">${t.localizacao}</span></div>
       <div class="meta-line">Data: <span class="meta-value">${t.data || "Sem Data"}</span></div>
-
       <div class="card-actions">
         <button class="small-btn btn-use" onclick="usar('${t.idDoc}')">Usado</button>
       </div>
@@ -299,7 +298,6 @@ function renderHistorico() {
       <div class="meta-line">Cor: <span class="meta-value">${t.cor || "-"}</span></div>
       <div class="meta-line">Localização: <span class="meta-value">${t.localizacao || "Sem Localização"}</span></div>
       <div class="meta-line">Data: <span class="meta-value">${t.data || "Sem Data"}</span></div>
-
       <div class="card-actions">
         <button class="small-btn btn-delete" onclick="apagar('${t.idDoc}')">Apagar</button>
       </div>
@@ -544,8 +542,8 @@ window.onload = () => {
 
   if (sw) {
     sw.addEventListener("change", () => {
-      document.body.classList.toggle("dark", sw.checked);
-      document.documentElement.classList.toggle("dark", sw.checked);
+      document.body.classList.toggle("dark");
+      document.documentElement.classList.toggle("dark");
       localStorage.setItem("modo", sw.checked ? "dark" : "light");
     });
   }
