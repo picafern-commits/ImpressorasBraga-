@@ -1845,11 +1845,16 @@ function renderUsers(lista = usersData) {
   const box = el("listaUsers");
   if (!box) return;
 
-  setText("countUsers", lista.length);
-  setText("countUsersMO365", lista.filter(temMO365).length);
-  setText("countUsersPistola", lista.filter(temPistola).length);
+  // 🔥 ORDENAR ALFABETICAMENTE PELO NOME
+  const listaOrdenada = [...lista].sort((a, b) =>
+    (a.nome || "").localeCompare(b.nome || "", "pt", { sensitivity: "base" })
+  );
 
-  box.innerHTML = lista.map((u, i) => `
+  setText("countUsers", listaOrdenada.length);
+  setText("countUsersMO365", listaOrdenada.filter(temMO365).length);
+  setText("countUsersPistola", listaOrdenada.filter(temPistola).length);
+
+  box.innerHTML = listaOrdenada.map((u, i) => `
     <div class="mobile-data-card">
       <div class="mobile-data-card-top">
         <h3>${u.nome || "-"}</h3>
@@ -1864,12 +1869,10 @@ function renderUsers(lista = usersData) {
       <div class="meta-line">Nome PC: <span class="meta-value">${u.nome_pc || "-"}</span></div>
       <div class="meta-line">TeamViewer: <span class="meta-value">${u.teamviewer || "-"}</span></div>
       <div class="meta-line">User MO365: <span class="meta-value">${u.user_mo365 || "-"}</span></div>
-      <div class="meta-line">Pw MO365: <span class="meta-value">${u.pw_mo365 || "-"}</span></div>
       <div class="meta-line">Email Bragalis: <span class="meta-value">${u.email_bragalis || "-"}</span></div>
 
       <div class="card-actions">
         ${temPistola(u) ? `<span class="badge ok">Com Pistola</span>` : `<span class="badge livre">Sem Pistola</span>`}
-        ${temTeamviewer(u) ? `<span class="badge ok">TeamViewer</span>` : `<span class="badge aviso">Sem TV</span>`}
       </div>
 
       <div class="card-actions">
@@ -1878,6 +1881,7 @@ function renderUsers(lista = usersData) {
 
       <div id="userExtra${i}" class="user-extra-box" style="display:none;">
         <div class="meta-line">Pass Eye Peak: <span class="meta-value">${u.pass_eye_peak || "-"}</span></div>
+        <div class="meta-line">Pw MO365: <span class="meta-value">${u.pw_mo365 || "-"}</span></div>
         <div class="meta-line">Pass Bragalis: <span class="meta-value">${u.pass_bragalis || "-"}</span></div>
       </div>
     </div>
