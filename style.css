@@ -59,6 +59,7 @@ p, span, label, div, td, th, a {
 .app-shell {
   min-height: 100vh;
   background: var(--bg);
+  padding-bottom: 84px;
 }
 
 .mobile-header {
@@ -77,6 +78,18 @@ p, span, label, div, td, th, a {
 .mobile-header h1 {
   margin: 0;
   font-size: 22px;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.header-text p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .open-menu-btn,
@@ -120,7 +133,8 @@ p, span, label, div, td, th, a {
 .stock-card,
 .history-card,
 .pc-card,
-.dashboard-card {
+.dashboard-card,
+.mobile-data-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 18px;
@@ -210,7 +224,8 @@ button:hover,
 .stock-card,
 .history-card,
 .pc-card,
-.dashboard-card {
+.dashboard-card,
+.mobile-data-card {
   position: relative;
   overflow: hidden;
 }
@@ -218,7 +233,8 @@ button:hover,
 .stock-card::before,
 .history-card::before,
 .pc-card::before,
-.dashboard-card::before {
+.dashboard-card::before,
+.mobile-data-card::before {
   content: "";
   position: absolute;
   left: 0;
@@ -447,4 +463,86 @@ table a:hover {
 
 .toast-app.erro {
   background: #dc2626;
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 120;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 10px;
+}
+
+.bottom-nav button {
+  min-height: 50px;
+  border-radius: 14px;
+  font-size: 20px;
+  margin: 0;
+}
+
+.mobile-data-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.mobile-data-card-top h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge.ok {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.badge.reserva {
+  background: rgba(168, 85, 247, 0.18);
+  color: #7c3aed;
+}
+
+.badge.ocupado {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.badge.livre {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.badge.aviso {
+  background: rgba(245, 158, 11, 0.2);
+  color: #d97706;
+}
+
+.user-extra-box {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.empty-state {
+  text-align: center;
 }
