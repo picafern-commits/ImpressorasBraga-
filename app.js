@@ -185,118 +185,118 @@ const pistolasData = [
 ========================= */
 const portasData = [
   { porta: "127", local: "Ilha 01", user: "Mesa 01", equipamento: "", ip: "" },
-  { porta: "126", local: "Ilha 01", user: "Mesa 01", equipamento: "Computador" ip: "192.168.10.101" },
-  
-  { porta: "125", local: "Ilha 01", user: "Mesa 02", equipamento: "Impressora" ip: "192.168.10.178" },
-  { porta: "124", local: "Ilha 01", user: "Mesa 02", equipamento: "Computador" ip: "192.168.10.102" },
-  
-  { porta: "123", local: "Ilha 02", user: "Mesa 03", equipamento: "" ip: "" },
-  { porta: "122", local: "Ilha 02", user: "Mesa 03", equipamento: "Computador" ip: "192.168.10.103" },
-  
-  { porta: "121", local: "Ilha 02", user: "Mesa 04", equipamento: "Impressora" ip: "192.168.10.179" },
-  { porta: "120", local: "Ilha 02", user: "Mesa 04", equipamento: "Computador" ip: "192.168.10.104" },
-  
-  { porta: "119", local: "Ilha 03", user: "Mesa 05", equipamento: "Impressora" ip: "192.168.10.180" },
-  { porta: "118", local: "Ilha 03", user: "Mesa 05", equipamento: "Computador" ip: "192.168.10.105" },
-  
-  { porta: "117", local: "Ilha 03", user: "Mesa 06", equipamento: "" ip: "" },
-  { porta: "116", local: "Ilha 03", user: "Mesa 06", equipamento: "Computador" ip: "192.168.10.106" },
-  
-  { porta: "115", local: "Ilha 04", user: "Mesa 07", equipamento: "Impressora" ip: "192.168.10.181" },
-  { porta: "114", local: "Ilha 04", user: "Mesa 07", equipamento: "Computador" ip: "192.168.10.107" },
-  
-  { porta: "113", local: "Ilha 04", user: "Mesa 08", equipamento: "" ip: "" },
-  { porta: "112", local: "Ilha 04", user: "Mesa 08", equipamento: "Computador" ip: "192.168.10.108" },
-  
-  { porta: "111", local: "Ilha 05", user: "Mesa 09", equipamento: "Impressora" ip: "192.168.10.182" },
-  { porta: "110", local: "Ilha 05", user: "Mesa 09", equipamento: "Computador" ip: "192.168.10.109" },
-  
-  { porta: "109", local: "Ilha 05", user: "Mesa 10", equipamento: "" ip: "" },
-  { porta: "108", local: "Ilha 05", user: "Mesa 10", equipamento: "Computador" ip: "192.168.10.110" },
-  
-  { porta: "106", local: "Mesa 16", user: "Mesa 16", equipamento: "" ip: "" },
-  { porta: "105", local: "Mesa 16", user: "Pedro Machado", equipamento: "Computador" ip: "192.168.10.164" },
-  
-  { porta: "104", local: "Dep.Logistica", user: "Impressora", ip: "192.168.10.185" },
-  { porta: "103", local: "Dep.Logistica", user: "", ip: "" },
-  
-  { porta: "102", local: "Mesa 17", user: "Mesa 17", equipamento: ""  ip: "" },
-  { porta: "101", local: "Mesa 17", user: "Rafael Silva", ip: "192.168.10.117" },
-  
-  { porta: "139", local: "Mesa 14", user: "Mesa 14", ip: "192.168.10.187" },
-  { porta: "138", local: "Mesa 14", user: "José Silva", ip: "192.168.10.114" },
-  
-  { porta: "137", local: "Mesa 13", user: "Mesa 13", equipamento: ""  ip: "" },
-  { porta: "136", local: "Mesa 13", user: "Carlos Pinto / Andre Costa", ip: "192.168.10.113" },
-  
-  { porta: "143", local: "Mesa 11", user: "Mesa 11", equipamento: "Impressora" ip: "192.168.10.186" },
-  { porta: "142", local: "Mesa 11", user: "Carlos Avelino", ip: "192.168.10.111" },
-  
-  { porta: "141", local: "Mesa 12", user: "Mesa 12", equipamento: "" ip: "" },
-  { porta: "140", local: "Mesa 12", user: "Jorge Rodrigues", ip: "192.168.10.112" },
-  
-  { porta: "224", local: "BRA-BAL01", user: "BRA-BAL01", equipamento: "" ip: "" },
-  { porta: "223", local: "BRA-BAL01", user: "Jose Miguel / Gonçalo Santos", ip: "192.168.10.125" },
-  
-  { porta: "222", local: "BRA-BAL02", user: "BRA-BAL02", equipamento: "Impressora" ip: "192.168.10.183" },
-  { porta: "221", local: "BRA-BAL02", user: "Rafael Araujo / Fabio Silva", equipamento: "Computador" ip: "192.168.10.126" },
-  
-  { porta: "220", local: "BRA-BAL03", user: "BRA-BAL03", equipamento: "Impressora" ip: "192.168.10.184" },
-  { porta: "219", local: "BRA-BAL03", user: "Henrique Ferreira / Andre Costa", equipamento: "Computador" ip: "192.168.10.127" },
-  
-  { porta: "232", local: "BRA-CAL01", user: "BRA-CAL01", equipamento: "" ip: "" },
-  { porta: "231", local: "BRA-CAL01", user: "João Carlos", equipamento: "Computador" ip: "192.168.10.120" },
-  
-  { porta: "234", local: "BRA-CAL02", user: "BRA-CAL02", equipamento: "" ip: "" },
-  { porta: "233", local: "BRA-CAL02", user: "Pedro Fernandes", equipamento: "Computador" ip: "192.168.10.121" },
-  
-  { porta: "230", local: "BRA-CAL03", user: "BRA-CAL03", equipamento: "" ip: "" },
-  { porta: "229", local: "BRA-CAL03", user: "Tiago Melo", equipamento: "Computador" ip: "192.168.10.122" },
-  
-  { porta: "228", local: "BRA-CAL04", user: "BRA-CAL04", equipamento: "" ip: "" },
-  { porta: "227", local: "BRA-CAL04", user: "Carlos Pinto / Andre Costa", equipamento: "Computador" ip: "192.168.10.123" },
-  
-  { porta: "225", local: "BRA-CAL05", user: "BRA-CAL05", equipamento: "" ip: "" },
-  { porta: "226", local: "BRA-CAL05", user: "Ricardo Fernandes", equipamento: "Computador" ip: "192.168.10.152" },
-  
-  { porta: "304", local: "Escritorio", user: "André Veloso", equipamento: "Computador" ip: "192.168.10.163" },
-  { porta: "303", local: "Escritorio", user: "André Veloso", equipamento: "" ip: "" },
-  
-  { porta: "306", local: "Escritorio", user: "João Silva", equipamento: "" ip: "" },
-  { porta: "305", local: "Escritorio", user: "João Silva", equipamento: "Computador" ip: "192.168.10.162" },
-  
-  { porta: "302", local: "Escritorio", user: "César Soares", equipamento: "Computador" ip: "192.168.10.158" },
-  { porta: "301", local: "Escritorio", user: "João Ferreira", equipamento: "Computador" ip: "" },
-  
-  { porta: "316", local: "Escritorio", user: "Secre. Vazia", equipamento: "" ip: "" },
-  { porta: "315", local: "Escritorio", user: "Secre. Vazia", equipamento: "" ip: "" },
-  
-  { porta: "314", local: "Escritorio", user: "Elisabete Silva", equipamento: "" ip: "" },
-  { porta: "313", local: "Escritorio", user: "Elisabete Silva", equipamento: "Computador" ip: "" },
-  
-  { porta: "318", local: "Escritorio", user: "Caudia Silva", equipamento: "" ip: "" },
-  { porta: "317", local: "Escritorio", user: "Caudia Silva", equipamento: "Computador" ip: "" },
-  
-  { porta: "322", local: "Escritorio", user: "Lucinda Santos", equipamento: "" ip: "" },
-  { porta: "321", local: "Escritorio", user: "Lucinda Santos", equipamento: "Computador" ip: "" },
-  
-  { porta: "310", local: "Escritorio", user: "", equipamento: "" ip: "" },
-  { porta: "309", local: "Escritorio", user: "TASKalfa 2554ci", equipamento: "Impressora" ip: "192.168.10.197" },
-  
-  { porta: "308", local: "", user: "", equipamento: "" ip: "" },
-  { porta: "307", local: "", user: "", equipamento: "" ip: "" },
-  
-  { porta: "312", local: "", user: "", equipamento: "" ip: "" },
-  { porta: "311", local: "", user: "", equipamento: "" ip: "" },
-  
-  { porta: "320", local: "", user: "", equipamento: "" ip: "" },
-  { porta: "319", local: "", user: "", equipamento: "" ip: "" },
+  { porta: "126", local: "Ilha 01", user: "Mesa 01", equipamento: "Computador", ip: "192.168.10.101" },
 
-  { porta: "326", local: "", user: "", equipamento: "" ip: "" },
-  { porta: "325", local: "", user: "", equipamento: "" ip: "" },
-  
-  { porta: "3", local: "Escritorio Chefe", user: "", equipamento: "" ip: "" },
-  { porta: "2", local: "Escritorio Chefe", user: "Ricardo Venâncio", equipamento: "Computador" ip: "" }
+  { porta: "125", local: "Ilha 01", user: "Mesa 02", equipamento: "Impressora", ip: "192.168.10.178" },
+  { porta: "124", local: "Ilha 01", user: "Mesa 02", equipamento: "Computador", ip: "192.168.10.102" },
+
+  { porta: "123", local: "Ilha 02", user: "Mesa 03", equipamento: "", ip: "" },
+  { porta: "122", local: "Ilha 02", user: "Mesa 03", equipamento: "Computador", ip: "192.168.10.103" },
+
+  { porta: "121", local: "Ilha 02", user: "Mesa 04", equipamento: "Impressora", ip: "192.168.10.179" },
+  { porta: "120", local: "Ilha 02", user: "Mesa 04", equipamento: "Computador", ip: "192.168.10.104" },
+
+  { porta: "119", local: "Ilha 03", user: "Mesa 05", equipamento: "Impressora", ip: "192.168.10.180" },
+  { porta: "118", local: "Ilha 03", user: "Mesa 05", equipamento: "Computador", ip: "192.168.10.105" },
+
+  { porta: "117", local: "Ilha 03", user: "Mesa 06", equipamento: "", ip: "" },
+  { porta: "116", local: "Ilha 03", user: "Mesa 06", equipamento: "Computador", ip: "192.168.10.106" },
+
+  { porta: "115", local: "Ilha 04", user: "Mesa 07", equipamento: "Impressora", ip: "192.168.10.181" },
+  { porta: "114", local: "Ilha 04", user: "Mesa 07", equipamento: "Computador", ip: "192.168.10.107" },
+
+  { porta: "113", local: "Ilha 04", user: "Mesa 08", equipamento: "", ip: "" },
+  { porta: "112", local: "Ilha 04", user: "Mesa 08", equipamento: "Computador", ip: "192.168.10.108" },
+
+  { porta: "111", local: "Ilha 05", user: "Mesa 09", equipamento: "Impressora", ip: "192.168.10.182" },
+  { porta: "110", local: "Ilha 05", user: "Mesa 09", equipamento: "Computador", ip: "192.168.10.109" },
+
+  { porta: "109", local: "Ilha 05", user: "Mesa 10", equipamento: "", ip: "" },
+  { porta: "108", local: "Ilha 05", user: "Mesa 10", equipamento: "Computador", ip: "192.168.10.110" },
+
+  { porta: "106", local: "Mesa 16", user: "Mesa 16", equipamento: "", ip: "" },
+  { porta: "105", local: "Mesa 16", user: "Pedro Machado", equipamento: "Computador", ip: "192.168.10.164" },
+
+  { porta: "104", local: "Dep.Logistica", user: "Impressora", equipamento: "Impressora", ip: "192.168.10.185" },
+  { porta: "103", local: "Dep.Logistica", user: "", equipamento: "", ip: "" },
+
+  { porta: "102", local: "Mesa 17", user: "Mesa 17", equipamento: "", ip: "" },
+  { porta: "101", local: "Mesa 17", user: "Rafael Silva", equipamento: "Computador", ip: "192.168.10.117" },
+
+  { porta: "139", local: "Mesa 14", user: "Mesa 14", equipamento: "Impressora", ip: "192.168.10.187" },
+  { porta: "138", local: "Mesa 14", user: "José Silva", equipamento: "Computador", ip: "192.168.10.114" },
+
+  { porta: "137", local: "Mesa 13", user: "Mesa 13", equipamento: "", ip: "" },
+  { porta: "136", local: "Mesa 13", user: "Carlos Pinto / Andre Costa", equipamento: "Computador", ip: "192.168.10.113" },
+
+  { porta: "143", local: "Mesa 11", user: "Mesa 11", equipamento: "Impressora", ip: "192.168.10.186" },
+  { porta: "142", local: "Mesa 11", user: "Carlos Avelino", equipamento: "Computador", ip: "192.168.10.111" },
+
+  { porta: "141", local: "Mesa 12", user: "Mesa 12", equipamento: "", ip: "" },
+  { porta: "140", local: "Mesa 12", user: "Jorge Rodrigues", equipamento: "Computador", ip: "192.168.10.112" },
+
+  { porta: "224", local: "BRA-BAL01", user: "BRA-BAL01", equipamento: "", ip: "" },
+  { porta: "223", local: "BRA-BAL01", user: "Jose Miguel / Gonçalo Santos", equipamento: "Computador", ip: "192.168.10.125" },
+
+  { porta: "222", local: "BRA-BAL02", user: "BRA-BAL02", equipamento: "Impressora", ip: "192.168.10.183" },
+  { porta: "221", local: "BRA-BAL02", user: "Rafael Araujo / Fabio Silva", equipamento: "Computador", ip: "192.168.10.126" },
+
+  { porta: "220", local: "BRA-BAL03", user: "BRA-BAL03", equipamento: "Impressora", ip: "192.168.10.184" },
+  { porta: "219", local: "BRA-BAL03", user: "Henrique Ferreira / Andre Costa", equipamento: "Computador", ip: "192.168.10.127" },
+
+  { porta: "232", local: "BRA-CAL01", user: "BRA-CAL01", equipamento: "", ip: "" },
+  { porta: "231", local: "BRA-CAL01", user: "João Carlos", equipamento: "Computador", ip: "192.168.10.120" },
+
+  { porta: "234", local: "BRA-CAL02", user: "BRA-CAL02", equipamento: "", ip: "" },
+  { porta: "233", local: "BRA-CAL02", user: "Pedro Fernandes", equipamento: "Computador", ip: "192.168.10.121" },
+
+  { porta: "230", local: "BRA-CAL03", user: "BRA-CAL03", equipamento: "", ip: "" },
+  { porta: "229", local: "BRA-CAL03", user: "Tiago Melo", equipamento: "Computador", ip: "192.168.10.122" },
+
+  { porta: "228", local: "BRA-CAL04", user: "BRA-CAL04", equipamento: "", ip: "" },
+  { porta: "227", local: "BRA-CAL04", user: "Carlos Pinto / Andre Costa", equipamento: "Computador", ip: "192.168.10.123" },
+
+  { porta: "225", local: "BRA-CAL05", user: "BRA-CAL05", equipamento: "", ip: "" },
+  { porta: "226", local: "BRA-CAL05", user: "Ricardo Fernandes", equipamento: "Computador", ip: "192.168.10.152" },
+
+  { porta: "304", local: "Escritorio", user: "André Veloso", equipamento: "Computador", ip: "192.168.10.163" },
+  { porta: "303", local: "Escritorio", user: "André Veloso", equipamento: "", ip: "" },
+
+  { porta: "306", local: "Escritorio", user: "João Silva", equipamento: "", ip: "" },
+  { porta: "305", local: "Escritorio", user: "João Silva", equipamento: "Computador", ip: "192.168.10.162" },
+
+  { porta: "302", local: "Escritorio", user: "César Soares", equipamento: "Computador", ip: "192.168.10.158" },
+  { porta: "301", local: "Escritorio", user: "João Ferreira", equipamento: "Computador", ip: "" },
+
+  { porta: "316", local: "Escritorio", user: "Secre. Vazia", equipamento: "", ip: "" },
+  { porta: "315", local: "Escritorio", user: "Secre. Vazia", equipamento: "", ip: "" },
+
+  { porta: "314", local: "Escritorio", user: "Elisabete Silva", equipamento: "", ip: "" },
+  { porta: "313", local: "Escritorio", user: "Elisabete Silva", equipamento: "Computador", ip: "" },
+
+  { porta: "318", local: "Escritorio", user: "Claudia Silva", equipamento: "", ip: "" },
+  { porta: "317", local: "Escritorio", user: "Claudia Silva", equipamento: "Computador", ip: "" },
+
+  { porta: "322", local: "Escritorio", user: "Lucinda Santos", equipamento: "", ip: "" },
+  { porta: "321", local: "Escritorio", user: "Lucinda Santos", equipamento: "Computador", ip: "" },
+
+  { porta: "310", local: "Escritorio", user: "", equipamento: "", ip: "" },
+  { porta: "309", local: "Escritorio", user: "TASKalfa 2554ci", equipamento: "Impressora", ip: "192.168.10.197" },
+
+  { porta: "308", local: "", user: "", equipamento: "", ip: "" },
+  { porta: "307", local: "", user: "", equipamento: "", ip: "" },
+
+  { porta: "312", local: "", user: "", equipamento: "", ip: "" },
+  { porta: "311", local: "", user: "", equipamento: "", ip: "" },
+
+  { porta: "320", local: "", user: "", equipamento: "", ip: "" },
+  { porta: "319", local: "", user: "", equipamento: "", ip: "" },
+
+  { porta: "326", local: "", user: "", equipamento: "", ip: "" },
+  { porta: "325", local: "", user: "", equipamento: "", ip: "" },
+
+  { porta: "3", local: "Escritorio Chefe", user: "", equipamento: "", ip: "" },
+  { porta: "2", local: "Escritorio Chefe", user: "Ricardo Venâncio", equipamento: "Computador", ip: "" }
 ];
 
 /* =========================
@@ -1785,7 +1785,6 @@ function badgePorta(estado) {
   if (estado === "semuser") return `<span class="badge aviso">Sem user</span>`;
   return "";
 }
-
 function renderPortas(lista = portasData) {
   const box = el("listaPortas");
   if (!box) return;
@@ -1802,10 +1801,12 @@ function renderPortas(lista = portasData) {
       </div>
       <div class="meta-line">Localização: <span class="meta-value">${p.local || "-"}</span></div>
       <div class="meta-line">Utilizador: <span class="meta-value">${p.user || "-"}</span></div>
+      <div class="meta-line">Equipamento: <span class="meta-value">${p.equipamento || "-"}</span></div>
       <div class="meta-line">IP: <span class="meta-value">${p.ip ? `<a href="http://${p.ip}" target="_blank">${p.ip}</a>` : "-"}</span></div>
     </div>
   `).join("");
 }
+
 
 function filtrarPortas() {
   const txt = normalizarTexto(el("searchPortas")?.value || "");
