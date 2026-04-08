@@ -6,22 +6,47 @@
   <title>App Braga</title>
   <meta name="theme-color" content="#111827">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
+  <div id="mobileOverlay" class="mobile-overlay" onclick="fecharMenu()"></div>
+
+  <aside id="mobileSidebar" class="mobile-sidebar">
+    <div class="mobile-sidebar-top">
+      <h2>App Braga</h2>
+      <button class="close-menu-btn" onclick="fecharMenu()">✕</button>
+    </div>
+
+    <div class="mobile-menu">
+      <button onclick="irParaPagina('dashboard')">🏠 Dashboard</button>
+      <button onclick="irParaPagina('stockPage')">📦 Stock</button>
+      <button onclick="irParaPagina('historicoPage')">🕘 Histórico</button>
+      <button onclick="irParaPagina('computadores')">💻 Computadores</button>
+      <button onclick="irParaPagina('impressorasLista')">🖨️ Impressoras</button>
+      <button onclick="irParaPagina('manutencaoImpressoras')">🛠️ Manutenção</button>
+      <button onclick="irParaPagina('pistolasPage')">📱 Pistolas CK65</button>
+      <button onclick="irParaPagina('portasPage')">🌐 Portas Rede</button>
+      <button onclick="irParaPagina('usersPage')">👤 Users</button>
+      <button onclick="irParaPagina('config')">⚙️ Configurações</button>
+    </div>
+  </aside>
+
   <div class="app-shell">
     <header class="mobile-header">
-      <h1>App Braga</h1>
+      <button class="open-menu-btn" onclick="abrirMenu()">☰</button>
+      <div class="header-text">
+        <h1>App Braga</h1>
+        <p id="headerSubtitle">Gestão móvel</p>
+      </div>
     </header>
 
     <main class="mobile-main">
 
-      <section id="impressoras" class="mobile-page">
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="mobile-page">
         <div class="page-title">
           <h2>Dashboard Toners</h2>
           <p>Gestão rápida de stock</p>
@@ -39,6 +64,21 @@
           <div class="stat-card">
             <span>PCs</span>
             <strong id="countPCs">0</strong>
+          </div>
+        </div>
+
+        <div class="stats-grid mobile-stats">
+          <div class="stat-card">
+            <span>Pistolas</span>
+            <strong id="countPistolasDashboard">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Portas</span>
+            <strong id="countPortasDashboard">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Users</span>
+            <strong id="countUsersDashboard">0</strong>
           </div>
         </div>
 
@@ -90,6 +130,7 @@
         </div>
       </section>
 
+      <!-- STOCK -->
       <section id="stockPage" class="mobile-page" style="display:none;">
         <div class="page-title">
           <h2>Stock</h2>
@@ -103,6 +144,7 @@
         <div id="listaStock" class="cards-list"></div>
       </section>
 
+      <!-- HISTÓRICO -->
       <section id="historicoPage" class="mobile-page" style="display:none;">
         <div class="page-title">
           <h2>Histórico</h2>
@@ -112,6 +154,7 @@
         <div id="listaHistorico" class="cards-list"></div>
       </section>
 
+      <!-- COMPUTADORES -->
       <section id="computadores" class="mobile-page" style="display:none;">
         <div class="page-title">
           <h2>Computadores</h2>
@@ -133,6 +176,7 @@
         </div>
       </section>
 
+      <!-- IMPRESSORAS -->
       <section id="impressorasLista" class="mobile-page" style="display:none;">
         <div class="page-title">
           <h2>Impressoras</h2>
@@ -157,6 +201,7 @@
         </div>
       </section>
 
+      <!-- MANUTENÇÃO -->
       <section id="manutencaoImpressoras" class="mobile-page" style="display:none;">
         <div class="page-title">
           <h2>Manutenção Impressoras</h2>
@@ -192,6 +237,119 @@
         </div>
       </section>
 
+      <!-- PISTOLAS -->
+      <section id="pistolasPage" class="mobile-page" style="display:none;">
+        <div class="page-title">
+          <h2>Pistolas CK65</h2>
+          <p>Lista das pistolas</p>
+        </div>
+
+        <div class="stats-grid mobile-stats">
+          <div class="stat-card">
+            <span>Total</span>
+            <strong id="countPistolas">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Dia</span>
+            <strong id="countPistolasDia">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Reserva</span>
+            <strong id="countPistolasReserva">0</strong>
+          </div>
+        </div>
+
+        <div class="panel">
+          <input id="searchPistolas" type="text" placeholder="Pesquisar pistolas..." oninput="filtrarPistolas()">
+          <select id="filterTurnoPistolas" onchange="filtrarPistolas()">
+            <option value="">Todos os turnos</option>
+            <option value="Dia">Dia</option>
+          </select>
+          <select id="filterTipoPistolas" onchange="filtrarPistolas()">
+            <option value="">Todas</option>
+            <option value="ativas">Ativas</option>
+            <option value="reserva">Reserva</option>
+          </select>
+        </div>
+
+        <div id="listaPistolas" class="cards-list"></div>
+      </section>
+
+      <!-- PORTAS -->
+      <section id="portasPage" class="mobile-page" style="display:none;">
+        <div class="page-title">
+          <h2>Portas Rede</h2>
+          <p>Estado das portas</p>
+        </div>
+
+        <div class="stats-grid mobile-stats">
+          <div class="stat-card">
+            <span>Total</span>
+            <strong id="countPortas">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Ocupadas</span>
+            <strong id="countPortasUsadas">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Livres</span>
+            <strong id="countPortasLivres">0</strong>
+          </div>
+        </div>
+
+        <div class="panel">
+          <input id="searchPortas" type="text" placeholder="Pesquisar portas..." oninput="filtrarPortas()">
+          <select id="filterEstadoPortas" onchange="filtrarPortas()">
+            <option value="">Todos os estados</option>
+            <option value="ocupado">Ocupado</option>
+            <option value="livre">Livre</option>
+            <option value="semuser">Sem user</option>
+          </select>
+        </div>
+
+        <div id="listaPortas" class="cards-list"></div>
+      </section>
+
+      <!-- USERS -->
+      <section id="usersPage" class="mobile-page" style="display:none;">
+        <div class="page-title">
+          <h2>Users</h2>
+          <p>Lista de utilizadores</p>
+        </div>
+
+        <div class="stats-grid mobile-stats">
+          <div class="stat-card">
+            <span>Total</span>
+            <strong id="countUsers">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>MO365</span>
+            <strong id="countUsersMO365">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Pistola</span>
+            <strong id="countUsersPistola">0</strong>
+          </div>
+        </div>
+
+        <div class="panel">
+          <input id="searchUsers" type="text" placeholder="Pesquisar users..." oninput="filtrarUsers()">
+          <select id="filterUsersMO365" onchange="filtrarUsers()">
+            <option value="">Todos</option>
+            <option value="sim">Com MO365</option>
+            <option value="nao">Sem MO365</option>
+          </select>
+          <select id="filterUsersPistola" onchange="filtrarUsers()">
+            <option value="">Todos</option>
+            <option value="sim">Com Pistola</option>
+            <option value="nao">Sem Pistola</option>
+          </select>
+        </div>
+
+        <div id="listaUsers" class="cards-list"></div>
+      </section>
+
+      <!-- CONFIG -->
       <section id="config" class="mobile-page" style="display:none;">
         <div class="page-title">
           <h2>Configurações</h2>
@@ -209,13 +367,11 @@
     </main>
 
     <nav class="bottom-nav">
-      <button onclick="mudarPagina('impressoras')">🏠</button>
+      <button onclick="mudarPagina('dashboard')">🏠</button>
       <button onclick="mudarPagina('stockPage')">📦</button>
       <button onclick="mudarPagina('historicoPage')">🕘</button>
       <button onclick="mudarPagina('computadores')">💻</button>
-      <button onclick="mudarPagina('impressorasLista')">🖨️</button>
-      <button onclick="mudarPagina('manutencaoImpressoras')">🛠️</button>
-      <button onclick="mudarPagina('config')">⚙️</button>
+      <button onclick="abrirMenu()">☰</button>
     </nav>
   </div>
 
