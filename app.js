@@ -3339,3 +3339,113 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.toggleSidebar = toggleSidebar;
 window.closeSidebar = closeSidebar;
+
+
+/* SWIPE SIDEBAR IPHONE */
+let sidebarTouchStartX = 0;
+let sidebarTouchCurrentX = 0;
+let sidebarDragging = false;
+
+function getSidebarNode() {
+  return document.querySelector(".sidebar");
+}
+
+function getOverlayNode() {
+  return document.getElementById("sidebarOverlay");
+}
+
+function isSidebarOpen() {
+  const sidebar = getSidebarNode();
+  return !!sidebar && sidebar.classList.contains("open");
+}
+
+function openSidebar() {
+  const sidebar = getSidebarNode();
+  const overlay = getOverlayNode();
+  if (sidebar) sidebar.classList.add("open");
+  if (overlay) overlay.classList.add("show");
+}
+
+function closeSidebarSwipeSafe() {
+  const sidebar = getSidebarNode();
+  const overlay = getOverlayNode();
+  if (sidebar) {
+    sidebar.classList.remove("open");
+    sidebar.style.transform = "";
+  }
+  if (overlay) overlay.classList.remove("show");
+}
+
+window.closeSidebar = closeSidebarSwipeSafe;
+
+function handleTouchStartSidebar(event) {
+  if (window.innerWidth > 900) return;
+
+  const touch = event.touches[0];
+  sidebarTouchStartX = touch.clientX;
+  sidebarTouchCurrentX = touch.clientX;
+
+  const sidebar = getSidebarNode();
+  const open = isSidebarOpen();
+  const nearLeftEdge = sidebarTouchStartX <= 24;
+
+  if (open || nearLeftEdge) {
+    sidebarDragging = true;
+    if (!open) openSidebar();
+    if (sidebar) sidebar.style.transition = "none";
+  }
+}
+
+function handleTouchMoveSidebar(event) {
+  if (!sidebarDragging || window.innerWidth > 900) return;
+
+  const touch = event.touches[0];
+  sidebarTouchCurrentX = touch.clientX;
+
+  const sidebar = getSidebarNode();
+  if (!sidebar) return;
+
+  let delta = sidebarTouchCurrentX - sidebarTouchStartX;
+  if (!isSidebarOpen()) {
+    delta = Math.min(0, delta - 260);
+  } else {
+    delta = Math.min(0, delta);
+  }
+
+  if (delta < -260) delta = -260;
+  sidebar.style.transform = `translateX(${delta}px)`;
+}
+
+function handleTouchEndSidebar() {
+  if (!sidebarDragging || window.innerWidth > 900) return;
+
+  const sidebar = getSidebarNode();
+  if (!sidebar) return;
+
+  const moved = sidebarTouchCurrentX - sidebarTouchStartX;
+  sidebar.style.transition = "";
+
+  if (isSidebarOpen()) {
+    if (moved < -70) {
+      closeSidebarSwipeSafe();
+    } else {
+      sidebar.style.transform = "";
+      openSidebar();
+    }
+  } else {
+    if (moved > 70) {
+      sidebar.style.transform = "";
+      openSidebar();
+    } else {
+      closeSidebarSwipeSafe();
+    }
+  }
+
+  sidebarDragging = false;
+  sidebarTouchStartX = 0;
+  sidebarTouchCurrentX = 0;
+}
+
+document.addEventListener("touchstart", handleTouchStartSidebar, { passive: true });
+document.addEventListener("touchmove", handleTouchMoveSidebar, { passive: true });
+document.addEventListener("touchend", handleTouchEndSidebar, { passive: true });
